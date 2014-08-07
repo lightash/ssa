@@ -1,16 +1,16 @@
 clc;close all;clear all;
 
-load('d:\Dropbox\MATLAB\Био. комп. сис\signal\Ms.mat')
+load('D:\Dropbox\MATLAB\Био. комп. сис\signal\Ms.mat')
 
 N = 64;
 n = 16;
 A = Ms(1:N,1:n:n*N);
 
 noi = 1e-6:.2:1e-6 + 1;  % Noise vector
-stn = 500;               % Statistics size
+stn = 5%00;               % Statistics size
 ord = -1:.2:1;           % Histogram bars
 
-[a, b] = ABAxTriDecomp(A, noi, stn, ord, 'wrkspc_13-12-08_x1.mat');
+[a, b, e] = ABAxTriDecomp(A, 0, noi, stn, ord);%, 'wrkspc_13-12-08_x1.mat');
 
 A2 = zeros(2*N);
 for i = 1:N-1
@@ -25,7 +25,7 @@ end
 A2(2*N-1,:) = [A(N-3,:) A(N-1,:)];
 A2(2*N,:) = [A(N-2,:) A(N,:)];
 
-[a2, b2] = ABAxTriDecomp(A2, noi, stn, ord, 'wrkspc_13-12-08_x2.mat');
+[a2, b2] = ABAxTriDecomp(A2, noi, stn, ord);%, 'wrkspc_13-12-08_x2.mat');
 
 %%
 
