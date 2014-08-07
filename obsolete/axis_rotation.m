@@ -3,10 +3,10 @@ clc;
 close all;
 clear all;
 
-load('Signals\Msasr')
+load('D:\Dropbox\MATLAB\Диплом\Signals\Msasr')
 f = Msasr(1,:);
 
-% f = exp(0:-1e-1/4:-10/4)-exp(0:-1e-1/2:-10/2);
+% f = 10*(exp(0:-1e-1/4:-10/4)-exp(0:-1e-1/2:-10/2));
 
 sk = .05;       % Шаг квантования
 ss = 1.0;       % Шаг сетки (коэф. сжатия)

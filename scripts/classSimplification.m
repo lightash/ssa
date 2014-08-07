@@ -23,7 +23,7 @@ s22 = S2 - s21;
 
 mu0 = len(s11)/lS1;
 
-stn = 2e3;  % Statistics size
+stn = 2e4;  % Statistics size
 ord = 0:.01:1;  % Histogram bars
 
 noise = linspace(0,1,20);

@@ -2,7 +2,7 @@ clc;
 close all;
 clear all;
 
-load('Signals\krov','krov2','krov3')
+load('D:\Dropbox\MATLAB\Диплом\Signals\krov','krov2','krov3')
 N = 21;
 N1 = N^2;
 s = 148;
@@ -65,54 +65,13 @@ subplot(427),stem(Ebs_12,'.k'),axis tight,grid on
 subplot(428),stem(Ebs_22,'.k'),axis tight,grid on
     title('Энергетический спектр фрагмента 2','FontName','Times New Roman','FontSize',14)
 
-% figure('Color','w')
-% subplot(221),plot(k11,'k'),axis tight,grid on
-%     title({'Реализация для объекта класса 1,';'фрагмент 1'},'FontName','Times New Roman','FontSize',14)
-% subplot(222),plot(k12,'k'),axis tight,grid on
-%     title({'Реализация для объекта класса 1,';'фрагмент 2'},'FontName','Times New Roman','FontSize',14)
-% subplot(223),plot(k21,'k'),axis tight,grid on
-%     title({'Реализация для объекта класса 2,';'фрагмент 1'},'FontName','Times New Roman','FontSize',14)
-% subplot(224),plot(k22,'k'),axis tight,grid on
-%     title({'Реализация для объекта класса 1,';'фрагмент 2'},'FontName','Times New Roman','FontSize',14)
+figure('Color','w')
+subplot(221),plot(k11,'k'),axis tight,grid on
+    title({'Реализация для объекта класса 1,';'фрагмент 1'},'FontName','Times New Roman','FontSize',14)
+subplot(222),plot(k12,'k'),axis tight,grid on
+    title({'Реализация для объекта класса 1,';'фрагмент 2'},'FontName','Times New Roman','FontSize',14)
+subplot(223),plot(k21,'k'),axis tight,grid on
+    title({'Реализация для объекта класса 2,';'фрагмент 1'},'FontName','Times New Roman','FontSize',14)
+subplot(224),plot(k22,'k'),axis tight,grid on
+    title({'Реализация для объекта класса 1,';'фрагмент 2'},'FontName','Times New Roman','FontSize',14)
 
-% data = B_11;
-% 
-% axes = zeros(N,N);
-% proj = axes;
-% vproj = zeros(N);
-% for axi = 1:N
-%     
-%     axes(axi,:) = data(axi,:);
-% %     axis(axi,:) = axis(axi,:)/sqrt(axis(axi,:) * axis(axi,:)');
-%     
-%     for i = 1:N
-%         proj(axi,i) = data(i,:) * axes(axi,:)';  % Lenghts of projetions on chosen axes
-%         vproj(i,:) = proj(axi,i) * axes(axi,:);  % Vectors of projections
-%     end
-%     
-%     data = data - vproj;
-%     
-% end
-% 
-% for axi = 1:N
-%     vproj(axi,:) = proj(axi,i)*axes(axi,:);
-% end
-% 
-% figure
-% subplot(421),plot(B_11(1,:)),axis tight,grid on
-% subplot(422),plot(vproj(1,:)),axis tight,grid on
-% subplot(423),plot(B_11(2,:)),axis tight,grid on
-% subplot(424),plot(vproj(2,:)),axis tight,grid on
-% subplot(425),plot(B_11(20,:)),axis tight,grid on
-% subplot(426),plot(vproj(20,:)),axis tight,grid on
-% subplot(427),plot(B_11(21,:)),axis tight,grid on
-% subplot(428),plot(vproj(21,:)),axis tight,grid on
-% 
-% 
-% Ebs_11 = zeros(1,21);
-% for i = 1:21
-%     Ebs_11(i) = vproj(i,:)*vproj(i,:)';
-% end
-% 
-% figure
-% plot(Ebs_11),axis tight,grid on

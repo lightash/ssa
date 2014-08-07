@@ -1,4 +1,4 @@
-function [b2, a2] = OSR(a1)
+function [b2, a2,D,Q] = OSR(a1)
 %OSR   Periodic component of a square matrix
 %   [ B2(N), A2(N,N) ] = OSR( A1(N,N) ) returns the 
 %   periodic component of a square matrix A1
