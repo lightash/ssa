@@ -25,7 +25,7 @@ end
 A2(2*N-1,:) = [A(N-3,:) A(N-1,:)];
 A2(2*N,:) = [A(N-2,:) A(N,:)];
 
-[a2, b2] = ABAxTriDecomp(A2, noi, stn, ord);%, 'wrkspc_13-12-08_x2.mat');
+[a2, b2] = ABAxTriDecomp(A2, 0, noi, stn, ord);%, 'wrkspc_13-12-08_x2.mat');
 
 %%
 

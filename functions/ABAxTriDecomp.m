@@ -1,6 +1,7 @@
 function [a, b, e, a2, b2, e2] = ABAxTriDecomp(A, double, noi, stn, ord, fname)
 %ABAxTriDecomp   Decomposition of matrix A to vector B and
 % matrices Ax and Tri and their correlations with A axes.
+%   double - '1' for double components
 % If correlations are needed:
 %   noi - noise vector
 %   stn - statistics size
@@ -8,7 +9,8 @@ function [a, b, e, a2, b2, e2] = ABAxTriDecomp(A, double, noi, stn, ord, fname)
 %   fname - filename to save variables
 
 if nargin < 2, double = 0; end  % for only single components
-nosave = 0; if nargin < 6, nosave = 1; end  % by default or without fname arg
+
+nosave = 0; if nargin < 6, nosave = 1; end  % by default or without 'fname' arg
 
 a = struct;
 b = struct;
@@ -116,15 +118,13 @@ if nargin > 2  % if correlations are needed
 
 
          % For signal+noise
-         [a.b2,a.a2] = OSR(a.a);
+         [a.b2, a.a2] = OSR(a.a);
 
          [~, a.ax, a.lax, a.tri] = GSOrth(a.a2);  % Orthogonalization
 
-         for i = 1:N  % Normalization
-            if i<N
-               a.ltri(i) = len(a.tri(i,:));
-               a.tri(i,:) = a.tri(i,:)/a.ltri(i);
-            end
+         for i = 1:N-1  % Normalization
+            a.ltri(i) = len(a.tri(i,:));
+            a.tri(i,:) = a.tri(i,:)/a.ltri(i);
          end
 
          if double > 0  % Signal+noise for double components
@@ -158,7 +158,7 @@ if nargin > 2  % if correlations are needed
 
 
          % For noise only
-         [b.b2,b.a2] = OSR(noise);
+         [b.b2, b.a2] = OSR(noise);
 
          [~, b.ax, b.lax, b.tri] = GSOrth(b.a2);  % Orthogonalization
 
@@ -210,44 +210,46 @@ if nargin > 2  % if correlations are needed
          end
       end
 
-         if double > 0  % Histograms for double components
-            for i = 1:N-1
-               a2.hist_a(inoi,i,:) = hist(a2.cor_a(:,i),ord);
-               b2.hist_a(inoi,i,:) = hist(b2.cor_a(:,i),ord);
+      if double > 0  % Histograms for double components
+         for i = 1:N-1
+            a2.hist_a(inoi,i,:) = hist(a2.cor_a(:,i),ord);
+            b2.hist_a(inoi,i,:) = hist(b2.cor_a(:,i),ord);
 
-               a2.hist_b(inoi,i,:) = hist(a2.cor_b(:,i),ord);
-               b2.hist_b(inoi,i,:) = hist(b2.cor_b(:,i),ord);
+            a2.hist_b(inoi,i,:) = hist(a2.cor_b(:,i),ord);
+            b2.hist_b(inoi,i,:) = hist(b2.cor_b(:,i),ord);
 
-               a2.hist_ax(inoi,i,:) = hist(a2.cor_ax(:,i),ord);
-               b2.hist_ax(inoi,i,:) = hist(b2.cor_ax(:,i),ord);
+            a2.hist_ax(inoi,i,:) = hist(a2.cor_ax(:,i),ord);
+            b2.hist_ax(inoi,i,:) = hist(b2.cor_ax(:,i),ord);
 
-               if i < N-1
-                  a2.hist_tri(inoi,i,:) = hist(a2.cor_tri(:,i),ord);
-                  b2.hist_tri(inoi,i,:) = hist(b2.cor_tri(:,i),ord);
-               end
+            if i < N-1
+               a2.hist_tri(inoi,i,:) = hist(a2.cor_tri(:,i),ord);
+               b2.hist_tri(inoi,i,:) = hist(b2.cor_tri(:,i),ord);
             end
          end
+      end
 
 
-      a.am_cor_a(inoi,:) = abs(mean(a.cor_a,1));
-      a.am_cor_b(inoi,:) = abs(mean(a.cor_b,1));
-      a.am_cor_ax(inoi,:) = abs(mean(a.cor_ax,1));
-      a.am_cor_tri(inoi,:) = abs(mean(a.cor_tri,1));
-      b.am_cor_a(inoi,:) = abs(mean(b.cor_a,1));
-      b.am_cor_b(inoi,:) = abs(mean(b.cor_b,1));
-      b.am_cor_ax(inoi,:) = abs(mean(b.cor_ax,1));
-      b.am_cor_tri(inoi,:) = abs(mean(b.cor_tri,1));
+      am = @(cor) abs(mean(cor,1));
+      
+      a.am_cor_a(inoi,:)   = am(a.cor_a,1);
+      a.am_cor_b(inoi,:)   = am(a.cor_b,1);
+      a.am_cor_ax(inoi,:)  = am(a.cor_ax,1);
+      a.am_cor_tri(inoi,:) = am(a.cor_tri,1);
+      b.am_cor_a(inoi,:)   = am(b.cor_a,1);
+      b.am_cor_b(inoi,:)   = am(b.cor_b,1);
+      b.am_cor_ax(inoi,:)  = am(b.cor_ax,1);
+      b.am_cor_tri(inoi,:) = am(b.cor_tri,1);
 
-         if double > 0  % Absolute mean for double components
-            a2.am_cor_a(inoi,:) = abs(mean(a2.cor_a,1));
-            a2.am_cor_b(inoi,:) = abs(mean(a2.cor_b,1));
-            a2.am_cor_ax(inoi,:) = abs(mean(a2.cor_ax,1));
-            a2.am_cor_tri(inoi,:) = abs(mean(a2.cor_tri,1));
-            b2.am_cor_a(inoi,:) = abs(mean(b2.cor_a,1));
-            b2.am_cor_b(inoi,:) = abs(mean(b2.cor_b,1));
-            b2.am_cor_ax(inoi,:) = abs(mean(b2.cor_ax,1));
-            b2.am_cor_tri(inoi,:) = abs(mean(b2.cor_tri,1));
-         end
+      if double > 0  % Absolute mean for double components
+         a2.am_cor_a(inoi,:)   = am(a2.cor_a,1);
+         a2.am_cor_b(inoi,:)   = am(a2.cor_b,1);
+         a2.am_cor_ax(inoi,:)  = am(a2.cor_ax,1);
+         a2.am_cor_tri(inoi,:) = am(a2.cor_tri,1);
+         b2.am_cor_a(inoi,:)   = am(b2.cor_a,1);
+         b2.am_cor_b(inoi,:)   = am(b2.cor_b,1);
+         b2.am_cor_ax(inoi,:)  = am(b2.cor_ax,1);
+         b2.am_cor_tri(inoi,:) = am(b2.cor_tri,1);
+      end
 
    end
 
