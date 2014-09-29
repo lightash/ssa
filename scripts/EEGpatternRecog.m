@@ -1,68 +1,7 @@
 clc;
 close all;
 clear all;
-%{
-% Processing raw data
-ch_num = 64;
-cf = fopen('d:\Dropbox\MATLAB\Диплом\Signals\EEG Motor Movement-Imagery Dataset\channels.txt');
-for i = 1:ch_num
-   channels{i} = fgetl(cf);
-end
-fclose(cf);
 
-for patient = 1:10
-   
-   str = num2str(patient,'%.2d');
-   load(['d:\Dropbox\MATLAB\Диплом\Signals\EEG Motor Movement-Imagery Dataset\S0' str 'R03_edfm.mat'])
-   
-   for i = 1:ch_num
-      ch{i} = val(i,:);
-   end
-   ann = val(ch_num+1,:);
-   Fd = 160;
-   Ts = length(ch{1});
-   j = 0;
-   for i = 7:Ts
-      if (ann(i)>5e3) && (ann(i-1)>5e3) && (ann(i-2)>5e3) && (ann(i-3)>5e3) && (ann(i-4)>5e3) && (ann(i-5)>5e3) && (ann(i-6)>5e3)
-         j = j+1;
-         anni(j) = i-6;
-      end
-   end
-   j = 1;
-   mar(1) = 1;
-   for i = 2:length(anni)
-      if anni(i)-anni(i-1)>500
-         j = j+1;
-         mar(j) = anni(i);
-      end
-   end
-   mar = [mar Ts];
-
-   T0 = 1:2:29;
-   T1 = [4 6 12 14 18 24 26];
-   T2 = [2 8 10 16 20 22 28];
-
-   for i = 1:length(T0)
-      m = mar( T0(i) ) : mar( T0(i)+1 );
-      for j = 1:ch_num
-         sil{j}(i,1:length(m)) = ch{j}(m);
-      end
-   end
-   for i = 1:length(T1)
-      m = mar( T1(i) ) : mar( T1(i)+1 );
-      for j = 1:ch_num
-         mov1{j}(i,1:length(m)) = ch{j}(m);
-      end
-      m = mar( T2(i) ) : mar( T2(i)+1 );
-      for j = 1:ch_num
-         mov2{j}(i,1:length(m)) = ch{j}(m);
-      end
-   end
-
-   save(['d:\Dropbox\MATLAB\Диплом\Signals\EEG Motor Movement-Imagery Dataset\Processed\S0' str 'R03'],'ch','sil','mov1','mov2','Fd','Ts','mar','channels','ch_num')
-end
-   %%
-%}
 % The most different channel
 diff = zeros(10,64);
 for pat = 1:1

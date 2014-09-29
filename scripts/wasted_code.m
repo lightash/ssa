@@ -127,7 +127,7 @@ end
 shSK = shb2*sha2';
 disp(['lg(sh) -> ' num2str(round(log10(norm(shSK,inf))))])
 
---- вектор -> матрица ---
+% --- вектор -> матрица ---
 sh1(1,:) = sh(1:N1);
 for i = 1:N1
    sh1(i,:) = sh( (i-1)*N1+1 : i*N1 );
@@ -1021,3 +1021,43 @@ end
 
 figure,stem(rinI,'.:r')
 hold on,stem(abs(cor),'.k'),axis tight
+
+%% Processing raw data wrongly 2014-09-29
+ann = val(ch_num+1,:);
+j = 0;
+for i = 7:Ts
+   if (ann(i)>5e3) && (ann(i-1)>5e3) && (ann(i-2)>5e3) && (ann(i-3)>5e3) && (ann(i-4)>5e3) && (ann(i-5)>5e3) && (ann(i-6)>5e3)
+      j = j+1;
+      anni(j) = i-6;
+   end
+end
+j = 1;
+mar(1) = 1;
+for i = 2:length(anni)
+   if anni(i)-anni(i-1)>500
+      j = j+1;
+      mar(j) = anni(i);
+   end
+end
+mar = [mar Ts];
+
+T0 = 1:2:29;
+T1 = [4 6 12 14 18 24 26];
+T2 = [2 8 10 16 20 22 28];
+
+for i = 1:length(T0)
+   m = mar( T0(i) ) : mar( T0(i)+1 );
+   for j = 1:ch_num
+      sil{j}(i,1:length(m)) = raw{j}(m);
+   end
+end
+for i = 1:length(T1)
+   m = mar( T1(i) ) : mar( T1(i)+1 );
+   for j = 1:ch_num
+      mov1{j}(i,1:length(m)) = raw{j}(m);
+   end
+   m = mar( T2(i) ) : mar( T2(i)+1 );
+   for j = 1:ch_num
+      mov2{j}(i,1:length(m)) = raw{j}(m);
+   end
+end

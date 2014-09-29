@@ -18,8 +18,12 @@ for per = 1:length(T)
       data_offset = [data_win(N1+1-ind:N1) data_win(1:N1-ind)];
       
       % through N in ring (window end is connected to start)
-      data_win_mat = transform(data_offset,'matrix');
-      [vproj, portrait.period{per}.window{win}.win_basis] = GSOrth(imp_OSR(data_win_mat));
+      portrait.period{per}.window{win}.data_win_mat = transform(data_offset,'matrix');
+      
+      [portrait.period{per}.window{win}.nonOrth,...
+         portrait.period{per}.window{win}.rem] = imp_OSR(portrait.period{per}.window{win}.data_win_mat);
+      
+      [vproj, portrait.period{per}.window{win}.win_basis] = GSOrth(portrait.period{per}.window{win}.nonOrth);
       portrait.period{per}.window{win}.svproj(1,:) = sum(vproj,2);
       
       for rin = 2:N
