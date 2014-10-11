@@ -14,27 +14,30 @@ for per = 1:length(T)
       data_win = input( win : win + (N1-1) );
       
       % pre-offsetting data for phase correction
-      ind = round( win-1 - N1*floor( (win-1)/N1 ) );  % globally (from end to start)
-      data_offset = [data_win(N1+1-ind:N1) data_win(1:N1-ind)];
+%       ind = round( win-1 - N1*floor( (win-1)/N1 ) );  % globally (from end to start)
+%       data_offset = [data_win(N1+1-ind:N1) data_win(1:N1-ind)];
+      data_offset = data_win;
       
-      % through N in ring (window end is connected to start)
-      portrait.period{per}.window{win}.data_win_mat = transform(data_offset,'matrix');
+       data_win_mat = transform(data_offset,'matrix');
+%        portrait{per}{win}.data_win_mat = data_win_mat;
       
-      [portrait.period{per}.window{win}.nonOrth,...
-         portrait.period{per}.window{win}.rem] = imp_OSR(portrait.period{per}.window{win}.data_win_mat);
+      [nonOrth, portrait{per}{win}.rem] = imp_OSR(data_win_mat,'energy');
+      portrait{per}{win}.nonOrth = nonOrth;
       
-      [vproj, portrait.period{per}.window{win}.win_basis] = GSOrth(portrait.period{per}.window{win}.nonOrth);
-      portrait.period{per}.window{win}.svproj(1,:) = sum(vproj,2);
+      [vproj, portrait{per}{win}.win_basis] = GSOrth(nonOrth);
+      portrait{per}{win}.svproj(1,:) = sum(vproj,1);
       
-      for rin = 2:N
-         
-         data_ring = transform( [data_win(N1+1-rin:N1) data_win(1:N1-rin)] ,'matrix');
-         
-         portrait.period{per}.window{win}.svproj(rin,:) = sum( portrait.period{per}.window{win}.win_basis * data_ring' ,1)';
-         
-      end
+%       % through N in ring (window end is connected to start)
+%       for rin = 2:N
+%          
+%          data_ring = transform( [data_win(N1+1-rin:N1) data_win(1:N1-rin)] ,'matrix');
+%          
+%          portrait{per}{win}.svproj(rin,:) = sum( portrait{per}.window{win}.win_basis * data_ring' ,1)';
+%          
+%       end
    end
 end
+
 %          % pre-offsetting data for phase correction
 %          ind = round( win-1 - N1*floor( (win-1)/N1 ) );  % globally (from end to start)
 %          data1 = [data_win(N1+1-ind:N1) data_win(1:N1-ind)];
@@ -45,6 +48,6 @@ end
 %          
 %          % post-offsetting data for same phase in each window
 %          ind = round( win-1 - N*floor( (win-1)/N ) );  % locally (in each period N)
-%          portrait.period{per}.window{win}.per_offset(imp,:) = ...
-%             [portrait.period{per}.window{win}.per_win( imp, N+1-ind : N ),...
-%             portrait.period{per}.window{win}.per_win( imp, 1 : N-ind )];
+%          portrait{per}{win}.per_offset(imp,:) = ...
+%             [portrait{per}{win}.per_win( imp, N+1-ind : N ),...
+%             portrait{per}{win}.per_win( imp, 1 : N-ind )];
