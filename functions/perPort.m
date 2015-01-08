@@ -1,7 +1,10 @@
-function [portrait] = perPort(input,T)
+function [portrait] = perPort(input,T,imp_meth)
 %PERPORT   Periodic portrait of a signal
 %   input - signal vector
 %   T - vector of periods to compute
+%   imp_meth - string that defines which impulse matrix method to use
+
+if nargin < 3, imp_meth = 'OSR'; end  % by default
 
 % through periods
 for per = 1:length(T)
@@ -21,7 +24,23 @@ for per = 1:length(T)
        data_win_mat = transform(data_offset,'matrix');
 %        portrait{per}{win}.data_win_mat = data_win_mat;
       
-      [nonOrth, portrait{per}{win}.rem] = imp_OSR(data_win_mat,'energy');
+      % Use imp_OSR function
+      if strcmp(imp_meth,'OSR')
+         [nonOrth, portrait{per}{win}.rem] = imp_OSR(data_win_mat,'energy');
+         
+      % Use impAM function
+      elseif strcmp(imp_meth,'AM')
+         [nonOrth, Amp, portrait{per}{win}.rem] = impAM(data_win_mat,'energy');
+         MaxAmp = zeros(1,size(Amp,1));
+         for i = 1:size(Amp,1)
+            MaxAmp(i) = mean(Amp(i,:));
+%             if MaxAmp(i) < 1e-12
+%                MaxAmp(i) = min(Amp(i,:));
+%             end
+            nonOrth(i,:) = nonOrth(i,:) * MaxAmp(i);
+         end
+      end
+      
       portrait{per}{win}.nonOrth = nonOrth;
       
       [vproj, portrait{per}{win}.win_basis] = GSOrth(nonOrth);

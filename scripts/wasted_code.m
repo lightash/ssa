@@ -1021,7 +1021,6 @@ end
 
 figure,stem(rinI,'.:r')
 hold on,stem(abs(cor),'.k'),axis tight
-
 %% Processing raw data wrongly 2014-09-29
 ann = val(ch_num+1,:);
 j = 0;
@@ -1061,3 +1060,104 @@ for i = 1:length(T1)
       mov2{j}(i,1:length(m)) = raw{j}(m);
    end
 end
+%% impAM_test: correlations of continuous components and input signal 2014-10-23
+for mov = 1:4*Nmov1+1
+   if mov <= Nmov0
+      signal = mov0{F3}(mov,1:T^2)/len(mov0{F3}(mov,1:T^2));
+   elseif mov <= Nmov0 + Nmov1
+      signal = mov1{F3}(mov-Nmov0,1:T^2)/len(mov1{F3}(mov-Nmov0,1:T^2));
+      figure,plot(xcorr(signal,ormov1)),axis tight
+   elseif mov <= Nmov0 + 2*Nmov1
+      signal = mov2{F3}(mov-Nmov0-Nmov1,1:T^2);
+   end
+end
+
+for mov = 1:Nmov0
+   signal = mov0{F3}(mov,1:T^2);
+   cmov(1,mov) = ( signal/len(signal) ) * ( transform(ormov0/len(ormov0),'vector_repeat') )';
+   cmov(2,mov) = ( signal/len(signal) ) * ( transform(ormov1/len(ormov1),'vector_repeat') )';
+   cmov(3,mov) = ( signal/len(signal) ) * ( transform(ormov2/len(ormov2),'vector_repeat') )';
+end
+for mov = 1:Nmov1
+   signal = mov1{F3}(mov,1:T^2);
+   cmov(4,mov) = ( signal/len(signal) ) * ( transform(ormov0/len(ormov0),'vector_repeat') )';
+   cmov(5,mov) = ( signal/len(signal) ) * ( transform(ormov1/len(ormov1),'vector_repeat') )';
+   cmov(6,mov) = ( signal/len(signal) ) * ( transform(ormov2/len(ormov2),'vector_repeat') )';
+end
+for mov = 1:Nmov1
+   signal = mov2{F3}(mov,1:T^2);
+   cmov(7,mov) = ( signal/len(signal) ) * ( transform(ormov0/len(ormov0),'vector_repeat') )';
+   cmov(8,mov) = ( signal/len(signal) ) * ( transform(ormov1/len(ormov1),'vector_repeat') )';
+   cmov(9,mov) = ( signal/len(signal) ) * ( transform(ormov2/len(ormov2),'vector_repeat') )';
+end
+figure
+for i = 1:9
+   subplot(3,3,i),stem(cmov(i,:)),axis tight
+end
+%% impAM_test: some iterations plots
+subplot(2,2,1:2)
+plot(transform(a1,'vector'),'b'),hold on
+if i==1
+   subplot(2,2,2)
+   plot(transform(a1,'vector'),'b'),hold on
+   for k = 1:T
+      plot(transform(E(k,:),'vector_repeat'),'r'),hold on
+   end
+   plot(transform(A3,'vector'),'g'),hold on
+   plot(transform(or,'vector_repeat'),'k'),axis tight
+end
+subplot(2,2,1:2)
+plot(transform(a1,'vector'),'r'),hold on,axis tight
+plot(or(mov,:)-mean(or(mov,:)),'k'),hold on,axis([1 25 -200 200])
+subplot(2,2,3),plot(xcorr(transform(a1,'vector'))./[1:T^2,T^2-1:-1:1],'.:'),axis tight
+subplot(2,2,4),plot(e(1:n)),axis tight
+
+ormov0 = mean(or(1:Nmov0,:),1);
+ormov0 = ormov0/len(ormov0);
+ormov1 = mean(or(Nmov0+1:Nmov0+Nmov1,:),1);
+ormov1 = ormov1/len(ormov1);
+ormov2 = mean(or(Nmov0+Nmov1+1:Nmov0+Nmov1+Nmov2,:),1);
+ormov2 = ormov2/len(ormov2);
+%% betaSinCorr: mostly plots 2015-01-03
+if freq==1 || length(freq)==1
+   plot(linspace(0,length(inRaw)/Fd,length(inRaw))+0,inRaw(rept,:),'b'),axis tight,ylim([-170 170]),hold on
+   plot(linspace(0,length(M)/Fd,length(M)), M, 'r'),ylim([-170 170]),hold on
+end
+plot(linspace(0,length(Corr{freq,movm})/Fd,length(Corr{freq,movm})), Corr{freq,movm}, 'm'),axis tight,hold on
+
+figure(1)
+subplot(2,3,movm)
+plot(Corr{freq,movm}'),hold on
+plot(mean(Corr{freq,movm},1),'.-k'),hold on
+plot(mean(Corr{freq,movm}(1:2:end,:),1),'.-b'),hold on
+plot(mean(Corr{freq,movm}(2:2:end,:),1),'.-r'),axis tight
+
+for winb = 1:size(Corr{freq,movm},2)/meannum
+   a = mean(Corr{freq,movm},1);
+   Cmm{freq,movm}(winb) = mean( a((winb-1)*meannum+1:winb*meannum) );
+   b = mean(Corr{freq,movm}(1:2:end,:),1);
+   Cmmb{freq,movm}(winb) = mean( b((winb-1)*meannum+1:winb*meannum) );
+   c = mean(Corr{freq,movm}(2:2:end,:),1);
+   Cmmc{freq,movm}(winb) = mean( c((winb-1)*meannum+1:winb*meannum) );
+end
+figure(2)
+subplot(2,3,movm+3)
+plot(Cmm{freq,movm},'.-k'),hold on
+plot(Cmmb{freq,movm},'.-b'),hold on
+plot(Cmmc{freq,movm},'.-r'),axis tight
+
+m = 0;
+for winb = 1:floor( size(inF3,2)/length(t) - 1 )
+   if (winb/meancoef-floor(winb/meancoef)) < 1e-12
+      m = m+1;
+      Cmm(m,:) = mean( Cmr(winb-meancoef+1:winb,:) ,1);
+      subplot(2,1,2),plot(m*length(t)+1:(m+1)*length(t), Cmm(m,:), color(movm)),axis tight,hold on
+   end
+end
+
+for freq = 1:size(Corr,1)
+   En(freq) = sqrt((Corr{freq,movm}*Corr{freq,movm}') /length(Corr{freq,movm}));
+   Me(freq) = mean(Corr{freq,movm});
+end
+figure,plot(F,En,'b',F,Me,'r')
+

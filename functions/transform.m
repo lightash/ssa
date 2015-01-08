@@ -11,7 +11,7 @@ if nargin < 2, to_what = 'vector'; end  % by default or without 2nd arg
 
 if strcmp(to_what,'vector')
     out = in(1,:);
-    for i = 2:length(in)
+    for i = 2:size(in,1)
         out = [out in(i,:)];
     end
 

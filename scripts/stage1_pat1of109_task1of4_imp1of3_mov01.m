@@ -1,5 +1,5 @@
 clc;
-close all;
+% close all;
 clear all;
 
 load('d:\Dropbox\Signals\EEG Motor Movement-Imagery Dataset\Processed\S001\R03\S001R03')
@@ -9,13 +9,13 @@ F3 = 32;
 
 signal = mov1{F3}(1,1:T^2);
 
-n = 200;
+n = 400;
 remPort = cell(1,n);
 a1 = signal;
 e = zeros(1,n);
 for i = 1:n
    disp(i/n)
-   remPort{i} = perPort(a1,T);
+   remPort{i} = perPort(a1,T,'AM');
    for j = 1:T
       or = remPort{i}{1}{1}.svproj / len(remPort{i}{1}{1}.svproj);
       b2(j,:) = or * (or * remPort{i}{1}{1}.rem(j,:)');
