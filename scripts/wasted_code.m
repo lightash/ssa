@@ -1160,4 +1160,48 @@ for freq = 1:size(Corr,1)
    Me(freq) = mean(Corr{freq,movm});
 end
 figure,plot(F,En,'b',F,Me,'r')
+%% quasireverse 2015-01-27
+subplot(211),plot(x,mean(fq_m,1),'.-r'),grid,axis tight,hold on
+subplot(212),plot(x,mean(fqrt_m,1),'.-r'),axis tight,grid on,hold on
+
+for i = 1:size(fqrt_m,1)
+   dfb(i) = len(fq_m(i,:)-mean(fq_m,1));
+   dfr(i) = len(fqrt_m(i,:)-mean(fqrt_m,1));
+   dfk(i) = len(fqrt_m(i,:)-nrm(fr));
+end
+figure,plot(dfr,'r'),hold on,plot(dfk,'k'),hold on,plot(dfb,'b')
+
+plot(x,fq,'.',x,f,'r'),grid,axis tight
+subplot(212),plot(xqrt,fqrt,'.-'),grid,axis tight
+%% quasireverse 2015-01-29
+if annot(per) == 'N'
+   i=i+1;
+   corN(i) = cor(1,per);
+   corA(i) = cor(2,per);
+   corV(i) = cor(3,per);
+   des1(per) = cor(1,per) - cor(2,per);
+   des2(per) = cor(1,per) - cor(3,per);
+elseif annot(per) == 'A'
+   i=i+1;
+   corN(i) = cor(1,per);
+   corA(i) = cor(2,per);
+   corV(i) = cor(3,per);
+   des1(per) = cor(2,per) - cor(3,per);
+   des2(per) = cor(2,per) - cor(1,per);
+elseif annot(per) == 'V'
+   i=i+1;
+   corN(i) = cor(1,per);
+   corA(i) = cor(2,per);
+   corV(i) = cor(3,per);
+   des1(per) = cor(3,per) - cor(1,per);
+   des2(per) = cor(3,per) - cor(2,per);
+end
+%% QRT 2015-01-30
+if nargin < 4, qsa = 0; end  % by default
+
+qg = (-100 :qs: 100) + qsa;
+for i = 1:length(f)
+   [a,b] = min(abs(f(i)./qg-1));
+   fq(i) = qg(b); % Quanted function
+end
 

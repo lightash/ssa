@@ -1,4 +1,6 @@
-clc;close all;clear all
+clc;
+% close all;
+clear all
 
 % Processing raw data
 ch_num = 64;
@@ -10,10 +12,10 @@ end
 fclose(fid);
 
 Fd = 160;
-for patient = 2
+for patient = 1
    strS = ['S' num2str(patient,'%.3d')];
    
-   for run = 3
+   for run = 11  % R03|07|11
    
       strR = ['R' num2str(run,'%.2d')];
       load(       ['d:\Dropbox\Signals\EEG Motor Movement-Imagery Dataset\Raw\' strS '\' strR '\' strS strR '_edfm.mat']);
@@ -65,7 +67,7 @@ for patient = 2
          end
       end
 
-
+      mkdir(['d:\Dropbox\Signals\EEG Motor Movement-Imagery Dataset\Processed\' strS '\' strR])
       save(['d:\Dropbox\Signals\EEG Motor Movement-Imagery Dataset\Processed\' strS '\' strR '\' strS strR],...
          'ch_num','channels','Fd','raw','Ts','mov0','mov1','mov2','annot')
    end

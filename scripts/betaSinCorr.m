@@ -1,10 +1,11 @@
 clc;
-close all;
+% close all;
 clear all;
 
 pat = 1;
-load(['d:\Dropbox\Signals\EEG Motor Movement-Imagery Dataset\Processed\S00' num2str(pat) '\R03\S00' num2str(pat) 'R03']) % R03|07|11
-F = 1:.1:80;%[14:18 (10:14)*4/3 (19:26)*5/7];
+imp = '03';
+load(['d:\Dropbox\Signals\EEG Motor Movement-Imagery Dataset\Processed\S00' num2str(pat) '\R' imp '\S00' num2str(pat) 'R' imp]) % R03|07|11
+F = .1:.1:80;%[14:18 (10:14)*4/3 (19:26)*5/7];
 Ts = 1./F;
 meancoef = 4;
 meannum = 16;
@@ -17,10 +18,10 @@ for freq = 1:length(F)
    
    t = linspace(0,winS/Fd,winS); % 0 : 1/Fd : Ts(freq);
    
-   for movm = 1
+   for movm = 3
       disp([num2str(F(freq)) '   ' num2str(movm-1)])
 
-      eval(['inRaw = mov' num2str(movm-1) '{32};'])
+      eval(['inRaw = mov' num2str(movm-1) '{16};'])
 %       inRaw = raw{32};
       
       Cor = zeros(size(inRaw));
@@ -53,7 +54,11 @@ for freq = 1:length(F)
          defi(:,win ) = dfi';%+ winS/2
       end
       
-      Corr{freq,movm}(:,WIN) = mean(Cor(:,winI),2);
+      weights = [(1:11)/144 1/12 (11:-1:1)/144];
+      for i = 1:size(Cor(:,winI),2)
+         Cor(:,i) = Cor(:,i) * weights(i);
+      end
+      Corr{freq,movm}(:,WIN) = sum(Cor(:,winI),2);
       Deltafi{freq,movm} = defi;
       Meanwin{freq,movm} = M;
       
@@ -71,11 +76,17 @@ end
 
 figure
 for freq = 1:length(F)
-   plot(F(freq),Corr{freq,movm}(:,WIN )-300*(0:14)','k'),hold on%+ winS/2
+   Pl1(freq) = mean(Corr{freq,movm}(:,WIN ),1);
+   for rept = 1:size(inRaw,1)
+      Pl2(rept,freq) = Corr{freq,movm}(rept,WIN );
+   end
+%    plot(F(freq),mean(Corr{freq,movm}(:,WIN )+300,1),'r'),hold on
+%    plot(F(freq),Corr{freq,movm}(:,WIN )-300*(0:size(inRaw,1)-1)','k'),hold on,ylim([-5e3 2e3])%+ winS/2
 %    subplot(length(F),1,freq),plot(inRaw,'g')
 %    hold on,plot(Corr{freq,1}+Meanwin{freq,1}),ylim([-200 400]),ylabel(F(freq))
 end
-
+plot(F,Pl1,'r'),hold on
+plot(F,Pl2','k')
 % % Vertical lines between moves
 % mark = [0 0 -150 150];
 % for ann = 1:length(annot)
