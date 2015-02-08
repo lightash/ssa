@@ -2,7 +2,7 @@ function [xqrt,fqrt,fq] = QRT(f,qs,smooth,integrate)
 %QRT Quasi-reverse transformation
 %   [ xqrt,fqrt,fq ] = QRT( x,f,qs ) returns the 
 %   quasi-reverse transformation ( xqrt,fqrt ) and quanted function ( fq ) 
-%   of input function ( f ) with quanting step ( qs ).
+%   of input ( f ) with quanting step ( qs ).
 %   smooth - length of transition to be smoothed;
 %   integrate - whether to inegrate instead of absolute values.
 
