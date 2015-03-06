@@ -1204,4 +1204,33 @@ for i = 1:length(f)
    [a,b] = min(abs(f(i)./qg-1));
    fq(i) = qg(b); % Quanted function
 end
+%% quasireverse: minmax, stairs & stuff 2015-02-08
+for btype = 1:btypeN
+   disp(btype)
+   port_s{btype} = fi(anniNAV{btype},:);
+   Me = mean(port_s{btype},2);
+   for per = 1:size(port_s{btype},1)
+      port_s{btype}(per,:) = port_s{btype}(per,:) - Me(per);
+   end
+   minmax(btype,:) = [mean(min(port_s{btype},[],1)) mean(max(port_s{btype},[],1))];
+end
+
+[xs,fs] = stairs(xt{per},[ft{per}(2:end) ft{per}(end)]);
+fqrt{annNAV(per)}(per,1) = 0;
+for i = 2:length(xs)
+   fqrt{annNAV(per)}(per,xs(i-1)+1:xs(i)) = fs(i);
+end
+fqrt{annNAV(per)}(per,end) = 0;
+
+xt_all{per} = xt;
+ft_all{per} = ft;
+xqrt{btype} = [xqrt{btype} xt];
+
+xqrt{btype} = unique(sort(xqrt{btype}));
+fqrt{btype} = zeros(perN,length(xqrt{btype}));
+for per = 1:perN
+   fqrt{btype}(per,:) = interp1(xt_all{per},ft_all{per},xqrt{btype});
+end
+
+f = f*min(abs( [minmax(1)/min(f) minmax(2)/max(f)] ));
 
