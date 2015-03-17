@@ -1,5 +1,5 @@
 clc;
-close all;
+% close all;
 clear all;
 
 load('D:\Dropbox\Signals\incartdb\I20\I20proc.mat')
@@ -101,6 +101,7 @@ end
 port = cell(1,btypeN);
 for btype = 1:btypeN
    port{btype} = nrm(mean(f(anniNAV{btype},:),1));
+%    port{btype} = nrm( port{btype} - nrm(mean(f,1)) );
 % %    port(btype,:) = nrm(mean(fqrt{btype},1));
 end
 
@@ -261,14 +262,15 @@ for per = 1:perN
 %          window = 1:parti*partS;%winXL;(parti-1)*partS+
 %       end
 %       fg(per,:) = fg(per,:) + max(fg(per,:))*randn(1,winL)/12;
+      sig(per,:) = (nrm(fg(per,:) - mean(fg(per,:))));% - nrm(mean(f,1)));
       for btype = 1:btypeN
-         cor(btype,per) = nrm(fg(per,:) - mean(fg(per,:))) * nrm(port{btype} - mean(port{btype}))';%mean(fg(per,:))mean(port{btype})
+         cor(btype,per) = sig(per,:) * port{btype}';
 %          cor(btype,per) = nrm(fg(per,winwp) - mean(fg(per,winwp))) * nrm(port{btype}(winwp) - mean(port{btype}(winwp)))';%mean(fg(per,:))mean(port{btype})
 %          a = nrm(port{btype}(1:2:end) - mean(port{btype}(1:2:end)));
 %          b = nrm(port{btype}(2:2:end) - mean(port{btype}(2:2:end)));
 %          c = nrm(fg(per,1:2:end) - mean(fg(per,1:2:end)));
 %          d = nrm(fg(per,2:2:end) - mean(fg(per,2:2:end)));
-%          cor(btype,per) = sum(sqrt( a.^2+b.^2 .* a.*c + b.*d ));
+%          cor(btype,per) = sum( a.^2+b.^2 .* a.*c + b.*d );
          cor(btype,per) = (cor(btype,per) +1)/2;
       end
       

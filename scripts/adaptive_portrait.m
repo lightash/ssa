@@ -62,7 +62,7 @@ for per = 1:perN
    [~,ind] = max(cor(:,per));
    des(Bord(per),ind) = des(Bord(per),ind) + 1/Blen(Bord(per));
 end
-
+%%
 figure,plot(cor'),hold on,plot(Bord,'.-')
 
 figure
