@@ -1,9 +1,10 @@
 clc;
-clear all;
+% close all;
+% clear all;
 
-load('D:\Dropbox\Signals\incartdb\I20\I20proc.mat')
+load('D:\Dropbox\Signals\incartdb\I21\I21proc.mat')
 in = val(1,:);
-annot(2461) = 'N';   % Fusion of ventricular and normal beat
+% annot(2461) = 'N';   % Fusion of ventricular and normal beat
 
 all_beats = 1:length(annot);
 % Normal beat, Atrial premature beat, Premature ventricular contraction
@@ -23,7 +24,6 @@ disp('Generating adaptive portraits')
 perN = all_beats(end);  % Number of periods to use
 port_size = 400;        % Size of adaptive portrait
 port_num = ceil(perN/port_size);
-
 f = zeros(perN, winL );
 for per = 1:perN
    window = mark(per)+win(1): mark(per)+win(2);
@@ -31,22 +31,20 @@ for per = 1:perN
    f(per,:) = nrm(f(per,:) - mean(f(per,:)));
 end
 
-port = cell(1,btypeN);
-port{1} = zeros(port_num,winL);
-for ap = 1:port_num
-   ports = (ap-1)*port_size+1:min(ap*port_size,Blen(1));
-   disp(length(ports))
-   port{1}(ap,:) = nrm(mean(f( ports ,:),1));
-end
-
-for btype = 2:btypeN
-   port{btype} = nrm(mean(f(Bnum{btype},:),1));
-end
-
-figure
-plot(port{1}','b'),hold on
-plot(port{2},'g'),hold on
-plot(port{3},'r')
+% port = cell(1,btypeN);
+% port{1} = zeros(port_num,winL);
+% for ap = 1:port_num
+%    ports = (ap-1)*port_size+1:min(ap*port_size,Blen(1));
+%    disp(length(ports))
+%    port{1}(ap,:) = nrm(mean(f( ports ,:),1));
+% end
+% for btype = 2:btypeN
+%    port{btype} = nrm(mean(f(Bnum{btype},:),1));
+% end
+% figure
+% plot(port{1}','b'),hold on
+% plot(port{2},'g'),hold on
+% plot(port{3},'r')
 
 % Guessing
 disp('Guessing')
