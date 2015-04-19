@@ -62,7 +62,10 @@ for btype = 1:btypeN
 end
 %%
 % Composition
-Nbins = 16;
+for nb = 1:6
+   disp(nb)
+Nbins = 2^nb;%16;
+clear hyp scale H
 for i = 1:cormatL
    [hyp(i,:),scale(i,:)] = hist( [fcm(Bnum{1},i);fcm(Bnum{2},i)] ,Nbins);
    
@@ -76,13 +79,15 @@ for i = 1:cormatL
 end
 inf_dk = DK( H{1}, H{2}, Blen(1), Blen(2) );
 inf_az = AlphaZ( H{1}, H{2} );
+% %%
+[srt(nb,:),isrt(nb,:)] = sort(inf_dk,'descend');
+[srt1(nb,:),isrt1(nb,:)] = sort(inf_az,'descend');
+end
 %%
-[srt(1,:),isrt(1,:)] = sort(inf_dk,'descend');
-[srt(2,:),isrt(2,:)] = sort(inf_az,'descend');
-
-sN = zeros(1,8e2);
-for nd = 1:8e2
-   Ndots = 10*nd;
+nd_max = 1500;
+sN = zeros(1,nd_max);
+for nd = 1:nd_max
+   Ndots = 1*nd;
    ixN = isrt(:,1:Ndots);
 
    ixL = zeros(2,cormatL);
@@ -92,7 +97,7 @@ for nd = 1:8e2
    ixA = ixL(1,:) & ixL(2,:);
    sN(nd) = sum(ixA)/Ndots;
 end
-plot(sN)
+% plot(sN)
 % figure
 % plot(port{1}),hold on
 % plot(port{2},'g'),hold on
@@ -106,26 +111,26 @@ plot(sN)
 % Guessing
 disp('Guessing')
 
-des = zeros(btypeN,btypeN,8e2);
-for nd = 1:8e2
+des = zeros(btypeN,btypeN,nd_max);
+for nd = 1:nd_max
    disp(nd)
-   Ndots = 10*nd;
+   Ndots = 1*nd;
    win = sort(isrt(2,1:Ndots));
-for per = 1:perN
-%    disp(per)
-      
-      for btype = 1:btypeN
-         cor(btype,per) = fcm(per,win) * port{btype}(win)';
-         cor(btype,per) = (cor(btype,per) +1)/2;
+   for per = 1:perN
+   %    disp(per)
+
+         for btype = 1:btypeN
+            cor(btype,per) = fcm(per,win) * port{btype}(win)';
+            cor(btype,per) = (cor(btype,per) +1)/2;
+         end
+
+      if ~any(per == Bnum{3})
+         [~,ind] = max(cor(:,per));
+         des(Bord(per),ind,nd) = des(Bord(per),ind,nd) + 1/Blen(Bord(per));
       end
-      
-   if ~any(per == Bnum{3})
-      [~,ind] = max(cor(:,per));
-      des(Bord(per),ind,nd) = des(Bord(per),ind,nd) + 1/Blen(Bord(per));
    end
 end
-end
-
+%%
 figure
 k = 0;
 for i = 1:btypeN
@@ -133,13 +138,13 @@ for i = 1:btypeN
       k = k+1;
       
       subplot(btypeN,btypeN,k),plot( permute(des(i,j,:),[1 3 2]) ,'.-'),axis tight%([0 2 0 1])
-      xlabel(mean(temp))
+%       xlabel(mean(temp))
   end
 end
 % title((des(1,1)+des(2,2)+des(3,3))/3)
 % title((des(1,1)+des(2,2))/2)
 figure,plot(permute((des(1,1,:)+des(2,2,:))/2,[1 3 2]))
-%%
+% %%
 figure
 plot(port{1}),hold on
 plot(win,port{1}(win),'.'),hold on

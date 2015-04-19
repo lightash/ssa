@@ -41,7 +41,7 @@ btypeN = 2;
 % %%
 % for nb = 1:8
 Nbins = 2;%^nb;
-% clear hyp scale H
+clear hyp scale H
 for i = 1:winL
    [hyp(i,:),scale(i,:)] = hist( [f(Bnum{1},i);f(Bnum{2},i)] ,Nbins);
    
@@ -53,9 +53,10 @@ for i = 1:winL
       H{btype}( H{btype}(:,i)==0 | H{btype}(:,i)==minh, i) = mzh;
    end
 end
-% Ikl = DK( H{1}, H{2}, Blen(1), Blen(2) );
-Ikl = AlphaZ( H{1}, H{2} );
-
+Ikl = DK( H{1}, H{2}, Blen(1), Blen(2) );
+% Ikl = AlphaZ( H{1}, H{2} );
+% end
+%%
 load('indei_NA.mat')
 [~,maxi] = max(indei);
 % x = 1:winL;
@@ -67,7 +68,7 @@ load('indei_NA.mat')
 Ndots = length(wini{maxi-1});
 [srt,ix] = sort(Ikl,'descend');
 % hold on,plot(x(sort(ix(1:Ndots))),port{1}(sort(ix(1:Ndots))),'o')
-
+%%
 % Guessing
 disp('Guessing')
 win = sort(ix(1:Ndots))';

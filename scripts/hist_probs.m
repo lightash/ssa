@@ -36,6 +36,9 @@ port = cell(1,btypeN);
 for btype = 1:btypeN
    port{btype} = nrm(mean(f(Bnum{btype},:),1));
 end
+% figure
+% plot(port{1}),hold on
+% plot(port{2},'g')
 
 btypeN = 2;
 
@@ -62,26 +65,57 @@ for per = 1:perN
       end
    end
 end
-hipr = mean(hiprm,2);
+
+for btype = 1:btypeN
+%    hipr{btype} = mean(hiprm(Bnum{btype},:),2)';
+   for i = 1:Blen(btype)
+      [~,ix1] = sort(hiprm(Bnum{btype}(i),:),2,'descend');
+      vol1 = sort(ix1(1:64));
+      hipr{btype}(i) = mean(hiprm(Bnum{btype}(i),vol1),2)';
+   end
+end
+
+% figure,plot(hipr)
+
+figure
+vom = 20;
+for vo = 1:vom
+   Ndots = round(vo*Blen/vom);
+   for btype = 1:btypeN
+      [srt{btype},ix{btype}] = sort(hipr{btype},'descend');
+      vol{btype} = sort(ix{btype}(1:Ndots(btype)));
+   end
+
+   % x = 1:winL;
+   % figure
+   % plot(x(sort(ix(1:Ndots))),hipr(sort(ix(1:Ndots))),'o')
+
+   for btype = 1:btypeN
+      port1{btype}(vo,:) = (port{btype} + nrm(mean(f(Bnum{btype}(vol{btype}),:),1)))/2;%!!
+   end
+   subplot(121),plot(port1{1}(vo,:)),hold on
+   subplot(122),plot(port1{2}(vo,:),'g'),hold on
+end
 
 %%
 % Guessing
 disp('Guessing')
 win = 1:winL;
 
-cor = zeros(btypeN,perN);
-des = zeros(btypeN);
-for per = 1:perN
-   disp(per)
-   sig(per,:) = (nrm(f(per,win) - mean(f(per,win))));
-   for btype = 1:btypeN
-      cor(btype,per) = sig(per,:) * port{btype}(win)';
-      cor(btype,per) = (cor(btype,per) +1)/2;
-   end
-   
-   [~,ind] = max(cor(:,per));
-   if ~any(per == Bnum{3})
-      des(Bord(per),ind) = des(Bord(per),ind) + 1/length(Bpos{Bord(per)});
+des = zeros(btypeN,btypeN,vom);
+for vo = 1:vom
+   disp(vo)
+   for per = 1:perN
+
+         for btype = 1:btypeN
+            cor(btype,per) = f(per,win) * port1{btype}(vo,:)';
+            cor(btype,per) = (cor(btype,per) +1)/2;
+         end
+
+      if ~any(per == Bnum{3})
+         [~,ind] = max(cor(:,per));
+         des(Bord(per),ind,vo) = des(Bord(per),ind,vo) + 1/Blen(Bord(per));
+      end
    end
 end
 
@@ -91,15 +125,13 @@ for i = 1:btypeN
    for j = 1:btypeN
       k = k+1;
       
-      subplot(btypeN,btypeN,k),stem(des(i,j),'.-'),axis([0 2 0 1])
-      xlabel(des(i,j))
+      subplot(btypeN,btypeN,k),plot( permute(des(i,j,:),[1 3 2]) ,'.-'),axis tight,ylim([0 1])
   end
 end
-title((des(1,1)+des(2,2))/2)
+figure,plot(permute((des(1,1,:)+des(2,2,:))/2,[1 3 2]))
 
-nrm(hipr')*nrm(cor(1,:))'
-nrm(hipr')*nrm(cor(2,:))'
+% figure
+% plot(hipr)
+% hold on,plot(cor(1,:),'r')
+% hold on,plot(cor(2,:),'g')
 
-plot(hipr)
-hold on,plot(cor(1,:),'r')
-hold on,plot(cor(2,:),'g')
