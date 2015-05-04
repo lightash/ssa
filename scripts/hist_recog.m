@@ -38,70 +38,81 @@ for btype = 1:btypeN
 end
 
 btypeN = 2;
-% %%
-% for nb = 1:8
-Nbins = 2;%^nb;
-clear hyp scale H
+
+% Generating histograms
+Nbars = 16;
 for i = 1:winL
-   [hyp(i,:),scale(i,:)] = hist( [f(Bnum{1},i);f(Bnum{2},i)] ,Nbins);
+   [~,scale(i,:)] = hist( [f(Bnum{1},i);f(Bnum{2},i)] ,Nbars);
    
    for btype = 1:btypeN
+      Mh{btype}(i) = mean(f(Bnum{btype},i));
       H{btype}(:,i) = hist( f(Bnum{btype},i) ,scale(i,:))/Blen(btype)';
       % Распределить наименьший столбец по нулям
       [minh,indh] = min(H{btype}( H{btype}(:,i)>0, i));
       mzh = minh/( length( H{btype}( H{btype}(:,i)==0, i)) +1);
       H{btype}( H{btype}(:,i)==0 | H{btype}(:,i)==minh, i) = mzh;
+      H{btype}(:,i) = H{btype}(:,i)/sum(H{btype}(:,i));
    end
 end
-Ikl = DK( H{1}, H{2}, Blen(1), Blen(2) );
-% Ikl = AlphaZ( H{1}, H{2} );
-% end
 %%
-load('indei_NA.mat')
-[~,maxi] = max(indei);
-% x = 1:winL;
-% figure,plot(x,port{1},'-',x,port{2},'-g')%,x,port{3},'-r')
-% hold on,plot(wini{maxi-1},port{1}(wini{maxi-1}),'.',wini{maxi-1},port{2}(wini{maxi-1}),'.g')%wini{maxi-1},port{3}(wini{maxi-1}),'.r')
-% grid,axis tight
-% figure,subplot(211),plot(indei,'.-'),axis tight,subplot(212),plot(maxj,'.-'),axis tight
+% Border between p00 and p11
 
-Ndots = length(wini{maxi-1});
-[srt,ix] = sort(Ikl,'descend');
-% hold on,plot(x(sort(ix(1:Ndots))),port{1}(sort(ix(1:Ndots))),'o')
-%%
-% Guessing
-disp('Guessing')
-win = sort(ix(1:Ndots))';
-
-cor = zeros(btypeN,perN);
-des = zeros(btypeN);
-for per = 1:perN
-   disp(per)
-   sig(per,:) = (nrm(f(per,win) - mean(f(per,win))));
-   for btype = 1:btypeN
-      cor(btype,per) = sig(per,:) * port{btype}(win)';
-      cor(btype,per) = (cor(btype,per) +1)/2;
+% border = zeros(1,winL);
+for i = 1:winL
+   m1 = Mh{1}(i);
+   m2 = Mh{2}(i);
+   if m1 < m2
+      leftN(i) = 1;
+   else
+      leftN(i) = 0;
    end
    
-   [~,ind] = max(cor(:,per));
-   if ~any(per == Bnum{3})
-      des(Bord(per),ind) = des(Bord(per),ind) + 1/length(Bpos{Bord(per)});
+   Nbars = 256;
+   scali(i,:) = linspace(scale(i,1),scale(i,end),Nbars);
+   for btype = 1:btypeN
+      Hi{btype}(:,i) = interp1(scale(i,:),H{btype}(:,i),scali(i,:));
+      Hi{btype}(:,i) = Hi{btype}(:,i)/sum(Hi{btype}(:,i));
+   end
+   
+   for bari = 1:Nbars
+      if leftN(i)
+         brd(bari) = sum(Hi{1}( 1:bari ,i)) - sum(Hi{2}( bari+1:end ,i));
+      else
+         brd(bari) = sum(Hi{2}( 1:bari ,i)) - sum(Hi{1}( bari+1:end ,i));
+      end
+   end
+   [~,border(i)] = min(abs(brd));
+   
+   if leftN(i)
+      p00(i) = sum(Hi{1}(1:border(i),i));
+      p11(i) = sum(Hi{2}(border(i)+1:end,i));
+   else
+      p00(i) = sum(Hi{1}(border(i)+1:end,i));
+      p11(i) = sum(Hi{2}(1:border(i),i));
    end
 end
-% binn(nb) = (des(1,1)+des(2,2))/2;
-% end
 % %%
+% for i = 1:10:winL
+%    figure(i)
+%    plot(scali(i,:),Hi{1}(:,i),'.-'),hold on
+%    plot(scali(i,:),Hi{2}(:,i),'.-g'),hold on
+%    plot([scali(i,border(i)) scali(i,border(i))]+.5*mean(diff(scali(i,:))),[0 max([Hi{1}(:,i);Hi{2}(:,i)])],'k'),grid
+%    title(num2str([sum(Hi{1}(1:border(i),i)) sum(Hi{2}(border(i)+1:end,i)) leftN(i)]))
+% end
+%%
 figure
-k = 0;
-for i = 1:btypeN
-   for j = 1:btypeN
-      k = k+1;
-      
-      subplot(btypeN,btypeN,k),stem(des(i,j),'.-'),axis([0 2 0 1])
-      xlabel(des(i,j))
-  end
-end
-title((des(1,1)+des(2,2))/2)
+plot(diff([p00;p11]),'.-'),grid,axis([1 winL -1 1])
+
+
+
+
+
+
+
+
+
+
+
 
 
 

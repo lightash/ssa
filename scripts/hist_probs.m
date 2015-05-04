@@ -65,18 +65,18 @@ for per = 1:perN
       end
    end
 end
-
+%%
 for btype = 1:btypeN
-%    hipr{btype} = mean(hiprm(Bnum{btype},:),2)';
-   for i = 1:Blen(btype)
-      [~,ix1] = sort(hiprm(Bnum{btype}(i),:),2,'descend');
-      vol1 = sort(ix1(1:64));
-      hipr{btype}(i) = mean(hiprm(Bnum{btype}(i),vol1),2)';
-   end
+   hipr{btype} = mean(hiprm(Bnum{btype},:),2)';
+%    for i = 1:Blen(btype)
+%       [~,ix1] = sort(hiprm(Bnum{btype}(i),:),2,'descend');
+%       vol1 = sort(ix1(1:64));
+%       hipr{btype}(i) = mean(hiprm(Bnum{btype}(i),vol1),2)';
+%    end
 end
 
-% figure,plot(hipr)
-
+% figure,plot(hipr{2})
+%%
 figure
 vom = 20;
 for vo = 1:vom
