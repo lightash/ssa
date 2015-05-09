@@ -33,12 +33,11 @@ for per = 1:perN
 
    f(per,:) = nrm(f(per,:));
 end
-
 port = cell(1,btypeN);
 for btype = 1:btypeN
    port{btype} = nrm(mean(f(Bnum{btype},:),1));
 end
-%%
+
 % Detecting
 disp('Detecting')
 cor = zeros(btypeN,length(in));
@@ -55,10 +54,10 @@ for btype = 1:btypeN
    end
 end
 %%
-figure
-plot(cor'),hold on
-plot(mark,.8*ones(1,length(mark)),'.'),hold on
-plot(in+2,'m')
+% figure
+% plot(cor'),hold on
+% plot(mark,.8*ones(1,length(mark)),'.'),hold on
+% plot(in+2,'m')
 %%
 % % Global threshold N27 A192 V162
 % inx = 1:length(in);
@@ -70,31 +69,47 @@ plot(in+2,'m')
 %       cord{thri,btype} = inx(cor(btype,:)>=gthr(thri));
 %    end
 % end
+% %%
+% x = [gthr;gthr;gthr]';
+% figure,plot(x,det)
+% title(Blen'),axis tight
 %%
 % Local maximum
-lm_win = round(1.3*mean(diff(mark)));
+lm_winL = round(1.5*mean(diff(mark)));
+for five_mins = 1:round(Ts/Fd/60/5)
+   min_winL(five_mins) = min(diff(mark( mark>round((five_mins-1)*Fd*60*5)+1 & mark<round(five_mins*Fd*60*5) )));
+end
 
-for btype = 1%:btypeN
+for btype = 1:btypeN
    disp(btype)
 
-   cord = zeros(1,length(cor(btype,:))-lm_win+1);
-   for pos = 1:length(cor(btype,:))-lm_win+1
-      win = pos:pos+lm_win-1;
+   cord{btype} = zeros(1,length(cor(btype,:))-lm_winL+1);
+   for pos = 1:length(cor(btype,:))-lm_winL+1
+      win = pos:pos+lm_winL-1;
       
       [~,mi] = max(cor(btype,win));
-      cord(pos) = pos+mi-1;
+      cord{btype}(pos) = pos+mi-1;
    end
    
-   cord = unique(cord);
+   cord{btype} = unique(cord{btype});
+   cord_b = cord{btype};
+   
+   i = 1;
+   while i+1 < length(cord{btype})
+      c = find(cord_b == cord{btype}(i));
+      if diff(cord{btype}(i:i+1)) < .9*min_winL(ceil(c/Fd/60/5));
+         cord{btype} = [cord{btype}(1:i) cord{btype}(i+2:end)];
+      else
+         i = i+1;
+      end
+   end
 end
 
 %%
-x = [gthr;gthr;gthr]';
-figure,plot(x,det)
-title(Blen'),axis tight
-%%
 figure
-stem(cord,1.02*ones(1,length(cord)),'m'),hold on
+stem(cord{1},1.02*ones(1,length(cord{1})),'.m'),hold on
+% stem(cord{2},1.02*ones(1,length(cord{2})),'sm'),hold on
+% stem(cord{3},1.015*ones(1,length(cord{3})),'dm'),hold on
 stem(Bpos{1},1.01*ones(1,length(Bpos{1})),'.k'),hold on
 stem(Bpos{2},1.01*ones(1,length(Bpos{2})),'sk'),hold on
 stem(Bpos{3},1.01*ones(1,length(Bpos{3})),'dk'),hold on

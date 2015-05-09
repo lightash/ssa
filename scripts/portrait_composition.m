@@ -53,40 +53,47 @@ for i = 1:winL
       H{btype}( H{btype}(:,i)==0 | H{btype}(:,i)==minh, i) = mzh;
    end
 end
-% Ikl = DK( H{1}, H{2}, Blen(1), Blen(2) );
-% Ikl = AlphaZ( H{1}, H{2} );
-%%
-% Ikl = ED(f(Bnum{1},:),f(Bnum{2},:),1);
-% [~,Ikl] = ED(f(Bnum{1},:),f(Bnum{2},:),1);
-% Ikl = ED(f(Bnum{1},:),f(Bnum{2},:),2);
-% [~,Ikl] = ED(f(Bnum{1},:),f(Bnum{2},:),2);
-% Ikl = ED(f(Bnum{1},:),f(Bnum{2},:),3);
-[~,Ikl] = ED(f(Bnum{1},:),f(Bnum{2},:),3);
+I(1,:) = DK( H{1}, H{2}, Blen(1), Blen(2) );
+I(2,:) = AlphaZ( H{1}, H{2} );
+
+I(3,:) = ED(f(Bnum{1},:),f(Bnum{2},:),1);
+[~,I(4,:)] = ED(f(Bnum{1},:),f(Bnum{2},:),1);
+I(5,:) = ED(f(Bnum{1},:),f(Bnum{2},:),2);
+[~,I(6,:)] = ED(f(Bnum{1},:),f(Bnum{2},:),2);
+I(7,:) = ED(f(Bnum{1},:),f(Bnum{2},:),3);
+[~,I(8,:)] = ED(f(Bnum{1},:),f(Bnum{2},:),3);
+
+I(9,:) = HB(f(Bnum{1},:),f(Bnum{2},:));
+
+figure
+for form = 1:size(I,1)
+   Ikl = I(form,:);
+% for Ndots = 1:winL;
+%    disp(Ndots)
 % end
-% %%
-load('indei_NA.mat')
-[~,maxi] = max(indei);
-% x = 1:winL;
+% load('indei_NA.mat')
+% [~,maxi] = max(indei);
+x = 1:winL;
 % figure,plot(x,port{1},'-',x,port{2},'-g')%,x,port{3},'-r')
 % hold on,plot(wini{maxi-1},port{1}(wini{maxi-1}),'.',wini{maxi-1},port{2}(wini{maxi-1}),'.g')%wini{maxi-1},port{3}(wini{maxi-1}),'.r')
 % grid,axis tight
 % figure,subplot(211),plot(indei,'.-'),axis tight,subplot(212),plot(maxj,'.-'),axis tight
 
-Ndots = length(wini{maxi-1});
+Ndots = 40;%length(wini{maxi-1});
 [srt,ix] = sort(Ikl,'descend');
 % hold on,plot(x(sort(ix(1:Ndots))),port{1}(sort(ix(1:Ndots))),'o')
 % %%
 % Guessing
-disp('Guessing')
-win = sort(ix(1:Ndots))';
+% disp('Guessing')
+win = sort(ix(1:Ndots));
 
 cor = zeros(btypeN,perN);
 des = zeros(btypeN);
 for per = 1:perN
-   disp(per)
-   sig(per,:) = (nrm(f(per,win) - mean(f(per,win))));
+%    disp(per)
+   sig(per,1:Ndots) = (nrm(f(per,win) - mean(f(per,win))));
    for btype = 1:btypeN
-      cor(btype,per) = sig(per,:) * port{btype}(win)';
+      cor(btype,per) = sig(per,1:Ndots) * port{btype}(win)';
       cor(btype,per) = (cor(btype,per) +1)/2;
    end
    
@@ -110,7 +117,24 @@ end
 % end
 % title((des(1,1)+des(2,2))/2)
 
-figure
+% figure
+subplot(5,2,form)
 plot(Ikl),grid,axis tight
 xlabel(num2str([des(1,1) des(2,2) (des(1,1)+des(2,2))/2]))
+hold on,plot(x(sort(ix(1:Ndots))),Ikl(sort(ix(1:Ndots))),'.')
+
+% d(:,Ndots) = [des(1,1);des(2,2);(des(1,1)+des(2,2))/2];
+end
+% subplot(4,2,form)
+% plot(d'),grid,axis tight,ylim([.5 1])
+% end
+
+
+
+
+
+
+
+
+
 

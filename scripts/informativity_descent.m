@@ -44,6 +44,7 @@ cor = zeros(btypeN,perN);
 des = zeros(btypeN);
 indei = zeros(1,winL);
 maxj = zeros(1,winL);
+order = zeros(1,winL);
 wini = cell(1,winL);
 wini{1} = 1:winL;
 fg = f;
@@ -53,9 +54,12 @@ for per = 1:perN
       cor(btype,per) = fg(per,:) * port{btype}';
    end
    [~,ind] = max(cor(:,per));
-   des(Bord(per),ind) = des(Bord(per),ind) + 1/Blen(Bord(per));
+   if ~any(per == Bnum{3})
+      des(Bord(per),ind) = des(Bord(per),ind) + 1/Blen(Bord(per));
+   end
 end
-indei(1) = (des(1,1)+des(2,2)+des(3,3))/3;
+% indei(1) = (des(1,1)+des(2,2)+des(3,3))/btypeN;
+indei(1) = (des(1,1)+des(2,2))/btypeN;
 
 for i = 2:winL
    disp(i)
@@ -75,18 +79,24 @@ for i = 2:winL
          end
          
          [~,ind] = max(cor(:,per));
-         des(Bord(per),ind) = des(Bord(per),ind) + 1/length(Bpos{Bord(per)});
-         
+         if ~any(per == Bnum{3})
+            des(Bord(per),ind) = des(Bord(per),ind) + 1/length(Bpos{Bord(per)});
+         end
       end
-      indej(j) = (des(1,1)+des(2,2)+des(3,3))/3;
+%       indej(j) = (des(1,1)+des(2,2)+des(3,3))/btypeN;
+      indej(j) = (des(1,1)+des(2,2))/btypeN;
 %       DKL{i} = DKL(fg(:,winj));
       
    end
    
    [indei(i),maxj(i)] = max(indej);
-
    wini{i} = [wini{i-1}(1:maxj(i)-1) wini{i-1}(maxj(i)+1:end)];
-      
+   order(i-1) = find(port{1} == port{1}(wini{i-1}(maxj(i))));
+end
+for i = 1:winL
+   if size(find(order==i),2)==0
+      order(winL)=i;
+   end
 end
 %%
 load('indei_NA.mat')
