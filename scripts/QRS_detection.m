@@ -1,6 +1,5 @@
-clc;
-close all;
-clear all;
+clc
+clear all
 
 load('D:\Dropbox\Signals\incartdb\I20\I20proc.mat')
 in = val(1,:);
@@ -75,9 +74,9 @@ end
 % title(Blen'),axis tight
 %%
 % Local maximum
-lm_winL = round(1.5*mean(diff(mark)));
-for five_mins = 1:round(Ts/Fd/60/5)
-   min_winL(five_mins) = min(diff(mark( mark>round((five_mins-1)*Fd*60*5)+1 & mark<round(five_mins*Fd*60*5) )));
+lm_winL = round(1.25*mean(diff(mark)));
+for mins = 1:round(Ts/Fd/60)
+   min_winL(mins) = min(diff(mark( mark>round((mins-1)*Fd*60)+1 & mark<round(mins*Fd*60) )));
 end
 
 for btype = 1:btypeN
@@ -97,7 +96,7 @@ for btype = 1:btypeN
    i = 1;
    while i+1 < length(cord{btype})
       c = find(cord_b == cord{btype}(i));
-      if diff(cord{btype}(i:i+1)) < .9*min_winL(ceil(c/Fd/60/5));
+      if diff(cord{btype}(i:i+1)) < .9*min_winL(ceil(c/Fd/60));
          cord{btype} = [cord{btype}(1:i) cord{btype}(i+2:end)];
       else
          i = i+1;
@@ -107,7 +106,7 @@ end
 
 %%
 figure
-stem(cord{1},1.02*ones(1,length(cord{1})),'.m'),hold on
+stem(cord{1},cor(1,cord{1}),'om'),hold on
 % stem(cord{2},1.02*ones(1,length(cord{2})),'sm'),hold on
 % stem(cord{3},1.015*ones(1,length(cord{3})),'dm'),hold on
 stem(Bpos{1},1.01*ones(1,length(Bpos{1})),'.k'),hold on
@@ -116,7 +115,7 @@ stem(Bpos{3},1.01*ones(1,length(Bpos{3})),'dk'),hold on
 % stem(cord{27,1},ones(1,length(cord{27,1})),'b'),hold on
 % stem(cord{192,1},.99*ones(1,length(cord{192,1})),'g'),hold on
 % stem(cord{162,1},.98*ones(1,length(cord{162,1})),'r'),hold on
-ylim([.9 1.1])
+% ylim([.9 1.1])
 
 
 

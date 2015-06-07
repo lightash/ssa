@@ -1,8 +1,9 @@
 clc;
 clear all;
 
-load('D:\Dropbox\Signals\incartdb\I20\I20proc.mat')
-annot(2461) = 'N';   % Fusion of ventricular and normal beat
+file = '21';
+load(['D:\Dropbox\Signals\incartdb\I' file '\I' file 'proc.mat'])
+% annot(2461) = 'N';   % Fusion of ventricular and normal beat
 
 all_beats = 1:length(annot);
 % Normal beat, Atrial premature beat, Premature ventricular contraction
@@ -14,22 +15,22 @@ for i = 1:btypeN
    Bpos{i} = mark(Bnum{i});                                          % ann
    Bord(all_beats(annot ==  bmark(i))) = i*ones(1,length(Bpos{i}));  % annNAV
 end
-win = [-47 80];   % Borders of PQRST period
-winL = win(2)-win(1)+1;
+Bwin = [-47 80];   % Borders of PQRST period
+winL = Bwin(2)-Bwin(1)+1;
 perN = all_beats(end);  % Number of periods to use
 
+figure(1)
 des = zeros(size(val,1),btypeN,btypeN);
 for lead = 1:size(val,1)
    in = val(lead,:);
 
    % Generating portraits
-   disp('Generating adaptive portraits')
 
    f = zeros(perN, winL );
    for per = 1:perN
-      window = mark(per)+win(1): mark(per)+win(2);
+      window = mark(per)+Bwin(1): mark(per)+Bwin(2);
       f(per,:) = in(window);
-      f(per,:) = nrm(f(per,:) - mean(f(per,:)));
+      f(per,:) = nrm(f(per,:),1);
    end
 
    port = cell(1,btypeN);
@@ -37,17 +38,14 @@ for lead = 1:size(val,1)
       port{btype} = nrm(mean(f(Bnum{btype},:),1));
    end
 
-   plot(port{1}','b'),hold on
-   plot(port{2},'g'),hold on
-   plot(port{3},'r'),hold on
+   x = (lead-1)*3*winL+1:lead*3*winL;
+   plot(x,[port{1} port{2} port{3}]+.5),hold on
 
    % Guessing
-   disp('Guessing')
-   fg = f;
    for per = 1:perN
 
       for btype = 1:btypeN
-         cor(btype,per) = (fg(per,:) * port{btype}' +1)/2;
+         cor(btype,per) = (f(per,:) * port{btype}' +1)/2;
       end
 
       [~,ind] = max(cor(:,per));
@@ -55,8 +53,8 @@ for lead = 1:size(val,1)
    end
 
 end
-
-
+grid,axis tight
+%%
 figure
 k = 0;
 for i = 1:btypeN

@@ -2,7 +2,7 @@ function [E, C, A3] = impAM(a1, path)
 %impAM   Continuous and impulse components of a matrix.
 %   [ E(N_imp,N), C(N_imp,M), A3(M,N) ] = impAM( A1(M,N) ) returns the 
 %   continuous ( E(1,:) ) and impulse ( E(2:end, :) ) components and
-%   treir amplitudes along axes ( C ) of a matrix A1 
+%   their amplitudes along axes ( C ) of a matrix A1 
 %   and remains from crossings out ( A3 ).
 %   path - string that defines rows & columns that are crossed out:
 %   'from_end' - crossing out from end;

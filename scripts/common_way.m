@@ -16,8 +16,8 @@ for i = 1:btypeN
    Bpos{i} = mark(Bnum{i});                                          % ann
    Bord(all_beats(annot ==  bmark(i))) = i*ones(1,length(Bpos{i}));  % annNAV
 end
-win = [-47 80];   % Borders of PQRST period
-winL = win(2)-win(1)+1;
+Bwin = [-47 80];   % Borders of PQRST period
+winL = Bwin(2)-Bwin(1)+1;
 
 % Generating portraits
 disp('Generating portraits')
@@ -27,11 +27,10 @@ f = zeros(perN, winL );
 for per = 1:perN
 
    period = mark(per);
-   window = period+win(1): period+win(2);
+   window = period+Bwin(1): period+Bwin(2);
    f(per,:) = in(window);
-   f(per,:) = f(per,:) - mean(f(per,:));
 
-   f(per,:) = nrm(f(per,:));
+   f(per,:) = nrm(f(per,:),1);
 end
 
 port = cell(1,btypeN);
@@ -41,19 +40,25 @@ end
 
 % Guessing
 disp('Guessing')
-des = zeros(btypeN);
-fg = f;
+% btypeN = 2;
 
+des = zeros(btypeN);
 for per = 1:perN
    disp(per)
-      sig(per,:) = (nrm(fg(per,:) - mean(fg(per,:))));
-      for btype = 1:btypeN
-         cor(btype,per) = sig(per,:) * port{btype}';
-         cor(btype,per) = (cor(btype,per) +1)/2;
-      end
+   for btype = 1:btypeN
+      cor(btype,per) = f(per,:) * port{btype}';
+      cor(btype,per) = (cor(btype,per) +1)/2;
+   end
+   [~,ind] = max(cor(:,per));
       
-      [~,ind] = max(cor(:,per));
+%       [~,q12(per,:)] = des_MOD(port{1},port{2},f(per,:));
+%       [~,q23(per,:)] = des_MOD(port{2},port{3},f(per,:));
+%       [~,q13(per,:)] = des_MOD(port{1},port{3},f(per,:));
+%       [~,ind] = max(q12(per,:));
+      
+%    if ~any(per == Bnum{3})
       des(Bord(per),ind) = des(Bord(per),ind) + 1/Blen(Bord(per));
+%    end
 end
 
 figure
@@ -66,4 +71,11 @@ for i = 1:btypeN
       xlabel(des(i,j))
   end
 end
-title((des(1,1)+des(2,2)+des(3,3))/3)
+% title((des(1,1)+des(2,2)+des(3,3))/3)
+title((des(1,1)+des(2,2))/2)
+
+
+
+
+
+

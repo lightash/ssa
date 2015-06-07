@@ -16,8 +16,8 @@ for i = 1:btypeN
    Bpos{i} = mark(Bnum{i});                                          % ann
    Bord(all_beats(annot ==  bmark(i))) = i*ones(1,length(Bpos{i}));  % annNAV
 end
-win = [-47 80];   % Borders of PQRST
-winL = win(2)-win(1)+1;
+Bwin = [-47 80];   % Borders of PQRST
+winL = Bwin(2)-Bwin(1)+1;
 
 % Generating portraits
 perN = all_beats(end);  % Number of periods to use
@@ -25,7 +25,7 @@ f = zeros(perN, winL );
 for per = 1:perN
 
    period = mark(per);
-   window = period+win(1): period+win(2);
+   window = period+Bwin(1): period+Bwin(2);
    f(per,:) = in(window);
    f(per,:) = f(per,:) - mean(f(per,:));
 
@@ -53,7 +53,7 @@ for i = 1:winL
       H{btype}(:,i) = H{btype}(:,i)/sum(H{btype}(:,i));
    end
 end
-%%
+% %%
 % Border between p00 and p11
 Nbars = 256;
 border = zeros(1,Nbars);
@@ -85,6 +85,7 @@ for i = 1:winL
    end
 end
 probNA = mean([p00;p11],1);
+% probNA_nrm = probNA/sum(probNA);
 %%
 % for i = 110
 %    figure(i)
@@ -97,44 +98,69 @@ probNA = mean([p00;p11],1);
 % plot(diff([p00;p11]),'.-'),grid,axis([1 winL -1 1])
 %%
 % Guessing
-des = zeros(btypeN,btypeN);
-deswin = zeros(1,winL);
-desper = zeros(1,perN);
-for per = 1:perN
-   if ~any(per == Bnum{3})
-      for i = 1:winL
-         if leftN(i)
-            if f(per,i) < probNA(i)
-               deswin(i) = 1;
+Ikl = HB(f(Bnum{1},:),f(Bnum{2},:));
+
+for Ndots = 1:winL
+   disp(Ndots)
+   [srt,ix] = sort(Ikl,'descend');
+   win_dots = sort(ix(1:Ndots));
+   
+   des = zeros(btypeN,btypeN);
+   deswin = zeros(perN,winL);
+   desper = zeros(1,perN);
+   for per = 1:perN
+      if ~any(per == Bnum{3})
+         
+         for i = win_dots
+%          for i = 1:winL
+%             i = win_dots(j);
+            
+            if leftN(i)
+               if f(per,i) < bordNA(i)
+                  deswin(per,i) = sum(Hi{1}( scali(i,:)>f(per,i) & scali(i,:)<bordNA(i) ))/sum(probNA);
+               else
+                  deswin(per,i) = -sum(Hi{2}( scali(i,:)<f(per,i) & scali(i,:)>bordNA(i) ))/sum(probNA);
+               end
             else
-               deswin(i) = 2;
+               if f(per,i) < bordNA(i)
+                  deswin(per,i) = -sum(Hi{2}( scali(i,:)>f(per,i) & scali(i,:)<bordNA(i) ))/sum(probNA);
+               else
+                  deswin(per,i) = sum(Hi{1}( scali(i,:)<f(per,i) & scali(i,:)>bordNA(i) ))/sum(probNA);
+               end
             end
-         else
-            if f(per,i) < probNA(i)
-               deswin(i) = 2;
-            else
-               deswin(i) = 1;
-            end
+            
          end
+         desper(per) = sum(deswin(per,:));
+         ind(per) = ceil(-desper(per)+1);
+         des(Bord(per),ind(per)) = des(Bord(per),ind(per)) + 1/Blen(Bord(per));
+         
       end
-      desper(per) = median(deswin);
-      ind(per) = round(desper(per));
-      des(Bord(per),ind(per)) = des(Bord(per),ind(per)) + 1/Blen(Bord(per));
    end
+   
+   des_m(1,Ndots) = des(1,1);
+   des_m(2,Ndots) = des(1,2);
+   des_m(3,Ndots) = des(2,1);
+   des_m(4,Ndots) = des(2,2);
 end
+%%
+% figure
+% k = 0;
+% for i = 1:btypeN
+%    for j = 1:btypeN
+%       k = k+1;
+%       
+%       subplot(btypeN,btypeN,k),stem(des_m(i,j),'.-'),axis tight,ylim([0 1]),grid
+%       xlabel(des(i,j))
+%   end
+% end
+% title((des(1,1)+des(2,2))/2)
 %%
 figure
 k = 0;
-for i = 1:btypeN
-   for j = 1:btypeN
-      k = k+1;
-      
-      subplot(btypeN,btypeN,k),plot(des(i,j),'.-'),axis tight,ylim([0 1])
-  end
+for i = 1:btypeN^2
+   subplot(btypeN+1,btypeN,i),plot(des_m(i,:),'.-'),axis tight,ylim([0 1]),grid
 end
-title((des(1,1)+des(2,2))/2)
-
-
+subplot(btypeN+1,btypeN,5:6),plot((des_m(1,:)+des_m(4,:))/2,'.-'),axis tight,ylim([0 1]),grid
 
 
 

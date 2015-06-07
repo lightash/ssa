@@ -16,8 +16,8 @@ for i = 1:btypeN
    Bpos{i} = mark(Bnum{i});                                          % ann
    Bord(all_beats(annot ==  bmark(i))) = i*ones(1,length(Bpos{i}));  % annNAV
 end
-win = [-47 80];   % Borders of PQRST period
-winL = win(2)-win(1)+1;
+Bwin = [-47 80];   % Borders of PQRST period
+winL = Bwin(2)-Bwin(1)+1;
 
 % Generating portraits
 disp('Generating portraits')
@@ -26,7 +26,7 @@ f = zeros(perN, winL );
 for per = 1:perN
 
    period = mark(per);
-   window = period+win(1): period+win(2);
+   window = period+Bwin(1): period+Bwin(2);
    f(per,:) = in(window);
    f(per,:) = f(per,:) - mean(f(per,:));
 

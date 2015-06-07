@@ -23,7 +23,7 @@ for mov = 1:Nmov0+Nmov1+Nmov2
 %    n = 1;
 %    e = zeros(1,n);
 %    for iter = 1:n
-      disp([num2str(mov) ' ' num2str(iter/n,2)])
+%       disp([num2str(mov) ' ' num2str(iter/n,2)])
       [E,C,A3{mov}] = impAM(a1);
       or(mov,:) = sum( GSOrth(E) ,1);
 %       e(iter) = len(or(mov,:));
@@ -59,8 +59,9 @@ end
 
 figure
 plot(signal),hold on
-plot(sigor,'r'),hold on
-plot(siga3,'k'),hold on
+plot(sigor,'g'),hold on
+plot(siga3,'r'),hold on
+plot(sigor+siga3,'k'),hold on
 axis tight
 
 
