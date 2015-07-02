@@ -52,30 +52,58 @@ for i = 1:winL
       H{btype}( H{btype}(:,i)==0 | H{btype}(:,i)==minh, i) = mzh;
    end
 end
+%%
+i = 20;
+figure('Color','w')
+bar(scale(i,:),H{1}(:,i)','b'),hold on,bar(scale(i,:),H{2}(:,i)','g'),grid
+legend('N','A')
+xlabel('Значення характеристики форми','FontName','Times New Roman','FontSize',12)
+ylabel('Частка попадання','FontName','Times New Roman','FontSize',12)
+%%
 I(1,:) = DK( H{1}, H{2}, Blen(1), Blen(2) );
+%%
+figure('Color','w')
+plot(I(1,:),'.-k'),grid,axis tight
+% xlabel('Номер отсчёта','FontName','Times New Roman','FontSize',12)
+% ylabel('Информативность','FontName','Times New Roman','FontSize',12)
+xlabel('Номер відліку','FontName','Times New Roman','FontSize',12)
+ylabel('Інформативність','FontName','Times New Roman','FontSize',12)
+%%
 I(2,:) = AlphaZ( H{1}, H{2} );
+%%
+figure('Color','w')
+plot(I(2,:),'.-k'),grid,axis tight
+% xlabel('Номер отсчёта','FontName','Times New Roman','FontSize',12)
+% ylabel('Информативность','FontName','Times New Roman','FontSize',12)
+xlabel('Номер відліку','FontName','Times New Roman','FontSize',12)
+ylabel('Інформативність','FontName','Times New Roman','FontSize',12)
+%%
 
-% Energy & dispersion
-I(3,:) = ED(f(Bnum{1},:),f(Bnum{2},:),1);
-[~,I(4,:)] = ED(f(Bnum{1},:),f(Bnum{2},:),1);
-I(5,:) = ED(f(Bnum{1},:),f(Bnum{2},:),2);
-[~,I(6,:)] = ED(f(Bnum{1},:),f(Bnum{2},:),2);
-I(7,:) = ED(f(Bnum{1},:),f(Bnum{2},:),3);
-[~,I(8,:)] = ED(f(Bnum{1},:),f(Bnum{2},:),3);
+% % Energy & dispersion
+% I(3,:) = ED(f(Bnum{1},:),f(Bnum{2},:),1);
+% [~,I(4,:)] = ED(f(Bnum{1},:),f(Bnum{2},:),1);
+% I(5,:) = ED(f(Bnum{1},:),f(Bnum{2},:),2);
+% [~,I(6,:)] = ED(f(Bnum{1},:),f(Bnum{2},:),2);
+% I(7,:) = ED(f(Bnum{1},:),f(Bnum{2},:),3);
+% [~,I(8,:)] = ED(f(Bnum{1},:),f(Bnum{2},:),3);
 
-I(9,:) = HB(f(Bnum{1},:),f(Bnum{2},:));
+I(3,:) = HB(f(Bnum{1},:),f(Bnum{2},:));
+% figure('Color','w')
+% plot(I(3,:),'.-'),grid,axis tight
+% xlabel('Номер отсчёта','FontName','Times New Roman','FontSize',12)
+% ylabel('Информативность','FontName','Times New Roman','FontSize',12)
+%%
+load('indei_NA.mat','inform','indei')
+I(4,:) = inform;
 
-load('indei_NA.mat','inform')
-I(10,:) = inform;
-
+%%
 for form = 1:size(I,1)
    disp(form)
    Ikl = I(form,:);
 
    x = 1:winL;
 
-   for Ndots = 1:winL
-      % Ndots = 100;%length(wini{maxi-1});
+   for Ndots = winL:-1:1
       [srt,ix] = sort(Ikl,'descend');
 
       % Guessing
@@ -95,7 +123,7 @@ for form = 1:size(I,1)
             des(Bord(per),ind) = des(Bord(per),ind) + 1/length(Bpos{Bord(per)});
          end
       end
-      des_m(form,Ndots) = (des(1,1)+des(2,2))/2;
+      des_m(form,winL - Ndots +1) = (des(1,1)+des(2,2))/2;
    end
 
 % figure
@@ -104,8 +132,13 @@ for form = 1:size(I,1)
 % xlabel(num2str([des(1,1) des(2,2) (des(1,1)+des(2,2))/2]))
 % hold on,plot(x(sort(ix(1:Ndots))),Ikl(sort(ix(1:Ndots))),'.')
 
-subplot(5,2,form)
-plot(des_m(form,:),'.-'),grid,axis([1 winL .5 1])
+% subplot(5,2,form)
+figure('Color','w')
+plot(des_m(form,:),'.-k'),grid,axis tight,ylim([.5 1])
+% xlabel('Количество исключённых отсчётов','FontName','Times New Roman','FontSize',12)
+% ylabel('Качество распознавания','FontName','Times New Roman','FontSize',12)
+xlabel('Кількість виключених відліків','FontName','Times New Roman','FontSize',12)
+ylabel('Якість розпізнавання','FontName','Times New Roman','FontSize',12)
 
 end
 

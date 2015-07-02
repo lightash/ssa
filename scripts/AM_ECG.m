@@ -27,19 +27,18 @@ for per = 1:perN
    period = mark(per);
    window = period+Bwin(1): period+Bwin(2);
    f(per,:) = in(window);
-   f(per,:) = f(per,:) - mean(f(per,:));
-
-   f(per,:) = nrm(f(per,:));
+   f(per,:) = nrm(f(per,:),1);
 end
-% port = cell(1,btypeN);
-% for btype = 1:btypeN
-% %    port{btype} = nrm(mean(f(Bnum{btype},:),1));
-%    port{btype} = nrm(AM(f(Bnum{btype},:)),1);
-% end
+btypeN = 2;
+port = cell(1,btypeN);
+for btype = 1:btypeN
+%    port{btype} = nrm(mean(f(Bnum{btype},:),1));
+   port{btype} = nrm(AM(f(Bnum{btype},:)),1);
+end
 
-%%
+% %%
 % [e, c, a2] = AM(f);
-% ec = (e'*c)';
+% ec = c'*e;
 % ecv = zeros(size(in));
 % fv = zeros(size(in));
 % pv = zeros(size(in));
@@ -57,9 +56,44 @@ end
 % plot(a2v,':k'),hold on
 % plot(ecv+a2v,'y'),hold on
 %%
-[E, C, A2] = impAM(f(Bnum{1}(1:winL),:),'from_end');
+E = cell(1,btypeN);
+C = cell(1,btypeN);
+Bas = cell(1,btypeN);
+Nport = cell(1,btypeN);
+for btype = 1:btypeN
+   [E{btype}, C{btype}] = impAM(f(Bnum{btype},:),'from_end');
+   [~,Bas{btype}] = GSOrth(E{btype});
+   figure,plot(Bas{btype}')
+   Nport{btype} = nrm((Bas{btype} * port{btype}')');
+   figure,plot(Nport{btype})
+end
 %%
-figure,plot(E')
+% Guessing
+des = zeros(btypeN);
+for per = 1:perN
+   for btype = 1:btypeN
+      Nf{btype}(per,:) = nrm((Bas{btype} * f(per,:)')');
+      cor(btype,per) = Nf{btype}(per,:) * Nport{btype}';
+      cor(btype,per) = (cor(btype,per) +1)/2;
+   end
+   [~,ind] = max(cor(:,per));
+      
+   if ~any(per == Bnum{3})
+      des(Bord(per),ind) = des(Bord(per),ind) + 1/Blen(Bord(per));
+   end
+end
+
+figure
+k = 0;
+for i = 1:btypeN
+   for j = 1:btypeN
+      k = k+1;
+      
+      subplot(btypeN,btypeN,k),stem(des(i,j),'.-'),axis([0 2 0 1])
+      xlabel(des(i,j))
+  end
+end
+title((des(1,1)+des(2,2))/2)
 
 
 

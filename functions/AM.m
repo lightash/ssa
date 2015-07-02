@@ -29,10 +29,10 @@ for i = 1:M
    a2(i,:) = a1(i,:) - c(i)*e;
 end
 
-% Leaving in 'c' only that differs from mean and giving 'e' length of that
-% mean
-mc = mean(c);
-e = e * mc;
-for i = 1:M
-   c(i) = c(i) - mc;
-end
+% % Leaving in 'c' only that differs from mean and giving 'e' length of that
+% % mean
+% mc = mean(c);
+% e = e * mc;
+% for i = 1:M
+%    c(i) = c(i) - mc;
+% end
