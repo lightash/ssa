@@ -38,23 +38,23 @@ mu2 = len(d.x22/len(X));
 dmu1_w = abs(mu1 - mu0);
 dmu2_w = abs(mu2 - mu0);
 
-w11 = (1 - dmu1_w/mu0)/3;
-w22 = (1 - dmu2_w/mu0)/3;
+d.w11 = (1 - dmu1_w/mu0)/3;
+d.w22 = (1 - dmu2_w/mu0)/3;
 
 dmu1_u = abs(len(d.x1) - ls1);
 dmu2_u = abs(len(d.x1) - ls21);
 
-u1 = (1 - dmu1_u/abs(ls1-ls21))/3;
-u2 = (1 - dmu2_u/abs(ls1-ls21))/3;
+d.u1 = (1 - dmu1_u/abs(ls1-ls21))/3;
+d.u2 = (1 - dmu2_u/abs(ls1-ls21))/3;
 
 dmu1_v = abs(len(d.x2) - ls12);
 dmu2_v = abs(len(d.x2) - ls2);
 
-v1 = (1 - dmu1_v/abs(ls2 - ls12))/3;
-v2 = (1 - dmu2_v/abs(ls2 - ls12))/3;
+d.v1 = (1 - dmu1_v/abs(ls2 - ls12))/3;
+d.v2 = (1 - dmu2_v/abs(ls2 - ls12))/3;
 
-q(1) = w11 + u1 + v1;   % decision for S1
-q(2) = w22 + u2 + v2;   %              S2
+q(1) = d.w11 + d.u1 + d.v1;   % decision for S1
+q(2) = d.w22 + d.u2 + d.v2;   %              S2
 
 if q(1) >= q(2)
    des = 1;

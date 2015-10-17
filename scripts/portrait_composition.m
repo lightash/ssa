@@ -54,8 +54,24 @@ for i = 1:winL
 end
 %%
 i = 20;
+Hb = zeros(4,size(H{1}(:,i),1)); % Nback Aback Nfore Afore
+for j = 1:size(H{1}(:,i),1)
+   if H{1}(j,i) > H{2}(j,i)
+      Hb(1,j) = H{1}(j,i);
+      Hb(4,j) = H{2}(j,i);
+   else
+      Hb(3,j) = H{1}(j,i);
+      Hb(2,j) = H{2}(j,i);
+   end
+end
 figure('Color','w')
-bar(scale(i,:),H{1}(:,i)','b'),hold on,bar(scale(i,:),H{2}(:,i)','g'),grid
+o = bar(scale(i,:),Hb(1,:));hold on
+set(o,'FaceColor',[.5 .5 .5]);
+bar(scale(i,:),Hb(2,:),'w'),hold on
+o = bar(scale(i,:),Hb(3,:));hold on
+set(o,'FaceColor',[.5 .5 .5]);
+bar(scale(i,:),Hb(4,:),'w'),grid
+% bar(scale(i,:),H{1}(:,i)','w'),hold on,bar(scale(i,:),H{2}(:,i)','k'),grid
 legend('N','A')
 xlabel('Значення характеристики форми','FontName','Times New Roman','FontSize',12)
 ylabel('Частка попадання','FontName','Times New Roman','FontSize',12)
@@ -94,9 +110,9 @@ I(3,:) = HB(f(Bnum{1},:),f(Bnum{2},:));
 % ylabel('Информативность','FontName','Times New Roman','FontSize',12)
 %%
 load('indei_NA.mat','inform','indei')
-I(4,:) = inform;
 
 %%
+I(4,:) = inform;
 for form = 1:size(I,1)
    disp(form)
    Ikl = I(form,:);

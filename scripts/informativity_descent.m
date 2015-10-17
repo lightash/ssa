@@ -50,11 +50,12 @@ wini{1,1} = 1:winL;
 wini{2,1} = 1:winL;
 
 for per = 1:perN
-   for btype = 1:btypeN
-      cor(btype,per) = f(per,:) * port{btype}';
-   end
-   [~,ind] = max(cor(:,per));
    if ~any(per == Bnum{3})
+%       for btype = 1:btypeN
+%          cor(btype,per) = f(per,:) * port{btype}';
+%       end
+%       [~,ind] = max(cor(:,per));
+      ind = des_MOD(port{1},port{2},f(per,:));
       des(Bord(per),ind) = des(Bord(per),ind) + 1/Blen(Bord(per));
 %       des(Bord(per),ind) = des(Bord(per),ind) + 1/(Blen(1)+Blen(2));
    end
@@ -62,8 +63,8 @@ end
 % probi(1) = (des(1,1)+des(2,2)+des(3,3))/btypeN;
 probi(1,1) = des(1,1);
 probi(2,1) = des(2,2);
-% for i = 2:winL
-i=2;
+for i = 2:winL
+% i=2;
    disp(i)
    
    probj{1} = zeros(1,size(wini{1,i-1},2));
@@ -75,12 +76,13 @@ i=2;
       cor = zeros(btypeN,perN);
       des = zeros(btypeN);
       for per = 1:perN
-
-         cor(1,per) = nrm(f(per,winj),1) * nrm(port{1}(winj),1)';
-         cor(2,per) = nrm(f(per,winj),1) * nrm(port{2}(winj),1)';
-
-         [~,ind] = max(cor(:,per));
          if ~any(per == Bnum{3})
+
+%             cor(1,per) = nrm(f(per,winj),1) * nrm(port{1}(winj),1)';
+%             cor(2,per) = nrm(f(per,winj),1) * nrm(port{2}(winj),1)';
+%             [~,ind] = max(cor(:,per));
+            
+            ind = des_MOD( nrm(port{1}(winj),1), nrm(port{2}(winj),1), nrm(f(per,winj),1) );
             des(Bord(per),ind) = des(Bord(per),ind) + 1/Blen(Bord(per));
 %             des(Bord(per),ind) = des(Bord(per),ind) + 1/(Blen(1)+Blen(2));
          end
@@ -130,54 +132,55 @@ i=2;
 %       probj{2}(size(wini{1,i-1},2) + j) = des(2,2);
 %    end
    
+%    dprobj_mean = mean( [probj{1} ; probj{2}] ,1);
    dprobj_mean = mean( [probj{1}-probi(1,i-1) ; probj{2}-probi(2,i-1)] ,1);
-   %%
-   x = 1:winL;
-   figure('Color','w')
-   plot(x,probj{1}-probi(1,i-1),'k',x,probj{2}-probi(2,i-1),'--k',x,dprobj_mean,':k')
-%    legend('N','A','Среднее'),grid,axis tight
-%    xlabel({'Номер отсчёта' 'а)'},'FontName','Times New Roman','FontSize',12)
-%    ylabel('Изменения вероятностей распознавания','FontName','Times New Roman','FontSize',12)
-   legend('N','A','Середнє'),grid,axis tight
-   xlabel('Номер відліку','FontName','Times New Roman','FontSize',12)
-   ylabel('Зміна ймовірності розпізнавання','FontName','Times New Roman','FontSize',12)
-   %%
+%    %%
+%    x = 1:winL;
+%    figure('Color','w')
+%    plot(x,probj{1}-probi(1,i-1),'k',x,probj{2}-probi(2,i-1),'--k',x,dprobj_mean,':k')
+% %    legend('N','A','Среднее'),grid,axis tight
+% %    xlabel({'Номер отсчёта' 'а)'},'FontName','Times New Roman','FontSize',12)
+% %    ylabel('Изменения вероятностей распознавания','FontName','Times New Roman','FontSize',12)
+%    legend('N','A','Середнє'),grid,axis tight
+%    xlabel('Номер відліку','FontName','Times New Roman','FontSize',12)
+%    ylabel('Зміна ймовірності розпізнавання','FontName','Times New Roman','FontSize',12)
+%    %%
 %    figure('Color','w')
 %    plot(x,sort(probj{1}-probi(1,i-1),'descend'),'k',x,sort(probj{2}-probi(2,i-1),'descend'),'--k',x,sort(dprobj_mean,'descend'),':k')
 %    legend('N','A','Среднее'),grid,axis tight
 %    xlabel({'Номер отсчёта' 'б)'},'FontName','Times New Roman','FontSize',12)
 %    ylabel('Изменения вероятностей распознавания','FontName','Times New Roman','FontSize',12)
-   %%
-for Ndots = winL:-1:1
-      [~,ix] = sort(dprobj_mean);
-
-      % Guessing
-      win = sort(ix(1:Ndots));
-
-      cor = zeros(btypeN,perN);
-      des = zeros(btypeN);
-      for per = 1:perN
-         for btype = 1:btypeN
-            cor(btype,per) = nrm(f(per,win),1) * nrm(port{btype}(win),1)';
-            cor(btype,per) = (cor(btype,per) +1)/2;
-         end
-
-         [~,ind] = max(cor(:,per));
-         if ~any(per == Bnum{3})
-            des(Bord(per),ind) = des(Bord(per),ind) + 1/length(Bpos{Bord(per)});
-         end
-      end
-      des_m(Ndots) = (des(1,1)+des(2,2))/2;
-end
-%%
-x = 1:winL;
-figure('Color','w')
-plot(x,des_m(end:-1:1),'.-k'),grid,axis([1 winL .5 1])
-% xlabel('Количество исключённых отсчётов','FontName','Times New Roman','FontSize',12)
-% ylabel('Качество распознавания','FontName','Times New Roman','FontSize',12)
-xlabel('Кількість виключених відліків','FontName','Times New Roman','FontSize',12)
-ylabel('Якість розпізнавання','FontName','Times New Roman','FontSize',12)
-%%
+%    %%
+% for Ndots = winL:-1:1
+%       [~,ix] = sort(dprobj_mean);
+% 
+%       % Guessing
+%       win = sort(ix(1:Ndots));
+% 
+%       cor = zeros(btypeN,perN);
+%       des = zeros(btypeN);
+%       for per = 1:perN
+%          for btype = 1:btypeN
+%             cor(btype,per) = nrm(f(per,win),1) * nrm(port{btype}(win),1)';
+%             cor(btype,per) = (cor(btype,per) +1)/2;
+%          end
+% 
+%          [~,ind] = max(cor(:,per));
+%          if ~any(per == Bnum{3})
+%             des(Bord(per),ind) = des(Bord(per),ind) + 1/length(Bpos{Bord(per)});
+%          end
+%       end
+%       des_m(winL+1-Ndots) = (des(1,1)+des(2,2))/2;
+% end
+% %%
+% x = 1:winL;
+% figure('Color','w')
+% plot(x,des_m(end:-1:1),'.-k'),grid,axis([1 winL .5 1])
+% % xlabel('Количество исключённых отсчётов','FontName','Times New Roman','FontSize',12)
+% % ylabel('Качество распознавания','FontName','Times New Roman','FontSize',12)
+% xlabel('Кількість виключених відліків','FontName','Times New Roman','FontSize',12)
+% ylabel('Якість розпізнавання','FontName','Times New Roman','FontSize',12)
+% %%
 % x = 1:2*winL;
 % figure('Color','w')
 % plot(x,mean(probi,1),'k'),grid,axis([1 2*winL .5 1])
@@ -226,14 +229,14 @@ ylabel('Якість розпізнавання','FontName','Times New Roman','FontSize',12)
 %    end
    
 end
-%%
-x = 1:winL;
-figure('Color','w')
-plot(x,mean(probi,1),'.-k'),grid,axis([1 winL .5 1])
-% xlabel('Количество исключённых отсчётов','FontName','Times New Roman','FontSize',12)
-% ylabel('Качество распознавания','FontName','Times New Roman','FontSize',12)
-xlabel('Кількість виключених відліків','FontName','Times New Roman','FontSize',12)
-ylabel('Якість розпізнавання','FontName','Times New Roman','FontSize',12)
+% %%
+% x = 1:winL;
+% figure('Color','w')
+% plot(x,mean(probi,1),'.-k'),grid,axis([1 winL .5 1])
+% % xlabel('Количество исключённых отсчётов','FontName','Times New Roman','FontSize',12)
+% % ylabel('Качество распознавания','FontName','Times New Roman','FontSize',12)
+% xlabel('Кількість виключених відліків','FontName','Times New Roman','FontSize',12)
+% ylabel('Якість розпізнавання','FontName','Times New Roman','FontSize',12)
 %%
 % sync
 for i = 1:winL  % Filling the last one
@@ -258,10 +261,10 @@ end
 probi_mean = mean(probi,1);
 inform = zeros(2,winL);
 for i = 1:winL-1
-   inform(order(2,i),order(1,i)) = probi_mean(i) - probi_mean(i+1);
+   inform(order(2,i),order(1,i)) = probi_mean(i+1) - probi_mean(i);
 %    inform(order(2,i),order(1,i)) = probi_mean(i);
 end
-inform(order(2,winL),order(1,winL)) = probi_mean(winL) - .5;
+inform(order(2,winL),order(1,winL)) = .5 - probi_mean(winL);
 % inform(order(2,winL),order(1,winL)) = probi_mean(winL);
 % %%
 % load('indei.mat')
