@@ -1,4 +1,4 @@
-п»їclc;
+clc;
 % close all;
 clear all;
 
@@ -48,35 +48,38 @@ x = (Bwin(1):Bwin(2))/Fd*1e3;
 % plot(x,port{2},'k'),hold on
 % plot(x,d.s22,'-.k','LineWidth',1.5),hold on
 % legend('S_2','s_2_2'),grid on,axis tight
-% xlabel('Р’СЂРµРјСЏ РѕС‚ R-Р·СѓР±С†Р°, РјСЃ','FontName','Times New Roman','FontSize',12)
-% ylabel('Р’Р·Р°РёРјРЅРѕРѕСЂС‚РѕРіРѕРЅР°Р»СЊРЅС‹Рµ СЃРѕСЃС‚Р°РІР»СЏСЋС‰РёРµ','FontName','Times New Roman','FontSize',12)
-
-r = 1287;%randi(perN);
-[des,~,~,d] = des_MOD(port{1},port{2},f(r,:));
-figure('Color','w')
-subplot(121),stem([d.w11 d.u1 d.v1],'.k'),axis([0 4 -.3 .3]),grid
-title(Bord(r))
-ylabel(r)
-xlabel('w11      u1      v1')
-subplot(122),stem([d.w22 d.u2 d.v2],'.k'),axis([0 4 -.3 .3]),grid
-xlabel('w22      u2      v2')
-title(des)
+% xlabel('Время от R-зубца, мс','FontName','Times New Roman','FontSize',12)
+% ylabel('Взаимноортогональные составляющие','FontName','Times New Roman','FontSize',12)
+% %%
+% r = 1287;%randi(perN);
+% [des,~,~,d] = des_MOD(port{1},port{2},f(r,:));
+% figure('Color','w')
+% subplot(121),stem([d.w11 d.u1 d.v1],'.k'),axis([0 4 -.3 .3]),grid
+% set(gca,'XTickLabel','')
+% title(Bord(r))
+% ylabel('Значение критерия')
+% % ylabel(r)
+% xlabel('w11      u1      v1')
+% subplot(122),stem([d.w22 d.u2 d.v2],'.k'),axis([0 4 -.3 .3]),grid
+% set(gca,'XTickLabel','')
+% xlabel('w22      u2      v2')
+% % title(des)
 
 % figure('Color','w')
 % plot(x,port{1},'k',x,port{2},'--k',x,d.s12,'-.k',x,d.s21,':k'),hold on
 % plot(x,d.s11,'-.k',x,d.s22,':k','LineWidth',1.5),hold on
 % legend('S_1','S_2','s_1_2','s_2_1','s_1_1','s_2_2'),grid on,axis tight
-% % xlabel('Р’СЂРµРјСЏ РѕС‚ R-Р·СѓР±С†Р°, РјСЃ','FontName','Times New Roman','FontSize',12)
-% % ylabel('Р’Р·Р°РёРјРЅРѕРѕСЂС‚РѕРіРѕРЅР°Р»СЊРЅС‹Рµ СЃРѕСЃС‚Р°РІР»СЏСЋС‰РёРµ','FontName','Times New Roman','FontSize',12)
-% xlabel('Р§Р°СЃ РІС–РґРЅРѕСЃРЅРѕ R-Р·СѓР±С†СЏ, РјСЃ','FontName','Times New Roman','FontSize',12)
-% ylabel('Р’Р·Р°С”РјРЅРѕ-РѕСЂС‚РѕРіРѕРЅР°Р»СЊРЅС– СЃРєР»Р°РґРѕРІС–','FontName','Times New Roman','FontSize',12)
+% % xlabel('Время от R-зубца, мс','FontName','Times New Roman','FontSize',12)
+% % ylabel('Взаимноортогональные составляющие','FontName','Times New Roman','FontSize',12)
+% xlabel('Час відносно R-зубця, мс','FontName','Times New Roman','FontSize',12)
+% ylabel('Взаємно-ортогональні складові','FontName','Times New Roman','FontSize',12)
 % figure('Color','w')
 % plot(x,port{1},'k',x,port{2},'--k'),hold on
 % legend('Normal beats','Atrial premature beats'),grid on,axis tight
-% xlabel('Р’СЂРµРјСЏ РѕС‚ R-Р·СѓР±С†Р°, РјСЃ','FontName','Times New Roman','FontSize',12)
-% ylabel('Р¤РѕСЂРјР° QRS-РєРѕРјРїР»РµРєСЃРѕРІ РїРѕ С‚РёРїР°Рј','FontName','Times New Roman','FontSize',12)
-% xlabel('Р§Р°СЃ РІС–РґРЅРѕСЃРЅРѕ R-Р·СѓР±С†СЏ, РјСЃ','FontName','Times New Roman','FontSize',12)
-% ylabel('Р¤РѕСЂРјР° QRS-РєРѕРјРїР»РµРєСЃС–РІ РїРѕ С‚РёРїР°Рј','FontName','Times New Roman','FontSize',12)
+% xlabel('Время от R-зубца, мс','FontName','Times New Roman','FontSize',12)
+% ylabel('Форма QRS-комплексов по типам','FontName','Times New Roman','FontSize',12)
+% xlabel('Час відносно R-зубця, мс','FontName','Times New Roman','FontSize',12)
+% ylabel('Форма QRS-комплексів по типам','FontName','Times New Roman','FontSize',12)
 
 %%
 % Guessing

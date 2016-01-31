@@ -73,8 +73,10 @@ set(o,'FaceColor',[.5 .5 .5]);
 bar(scale(i,:),Hb(4,:),'w'),grid
 % bar(scale(i,:),H{1}(:,i)','w'),hold on,bar(scale(i,:),H{2}(:,i)','k'),grid
 legend('N','A')
-xlabel('Значення характеристики форми','FontName','Times New Roman','FontSize',12)
-ylabel('Частка попадання','FontName','Times New Roman','FontSize',12)
+% xlabel('Значення характеристики форми','FontName','Times New Roman','FontSize',12)
+% ylabel('Частка попадання','FontName','Times New Roman','FontSize',12)
+xlabel('Значения характеристики формы','FontName','Times New Roman','FontSize',12)
+ylabel('Доля попаданий','FontName','Times New Roman','FontSize',12)
 %%
 I(1,:) = DK( H{1}, H{2}, Blen(1), Blen(2) );
 %%
