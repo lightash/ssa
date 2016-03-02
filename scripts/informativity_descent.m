@@ -54,11 +54,11 @@ wini{2,1} = 1:winL;
 
 for per = 1:perN
    if ~any(per == Bnum{3})
-%       for btype = 1:btypeN
-%          cor(btype,per) = f(per,:) * port{btype}';
-%       end
-%       [~,ind] = max(cor(:,per));
-      ind = des_MOD(port{1},port{2},f(per,:));
+      for btype = 1:btypeN
+         cor(btype,per) = f(per,:) * port{btype}';
+      end
+      [~,ind] = max(cor(:,per));
+%       ind = des_MOD(port{1},port{2},f(per,:));
       des(Bord(per),ind) = des(Bord(per),ind) + 1/Blen(Bord(per));
 %       des(Bord(per),ind) = des(Bord(per),ind) + 1/(Blen(1)+Blen(2));
    end
@@ -81,11 +81,11 @@ for i = 2:winL%2*winL
       for per = 1:perN
          if ~any(per == Bnum{3})
 
-%             cor(1,per) = nrm(f(per,winj),1) * nrm(port{1}(winj),1)';
-%             cor(2,per) = nrm(f(per,winj),1) * nrm(port{2}(winj),1)';
-%             [~,ind] = max(cor(:,per));
+            cor(1,per) = nrm(f(per,winj),1) * nrm(port{1}(winj),1)';
+            cor(2,per) = nrm(f(per,winj),1) * nrm(port{2}(winj),1)';
+            [~,ind] = max(cor(:,per));
             
-            ind = des_MOD( nrm(port{1}(winj),1), nrm(port{2}(winj),1), nrm(f(per,winj),1) );
+%             ind = des_MOD( nrm(port{1}(winj),1), nrm(port{2}(winj),1), nrm(f(per,winj),1) );
             des(Bord(per),ind) = des(Bord(per),ind) + 1/Blen(Bord(per));
 %             des(Bord(per),ind) = des(Bord(per),ind) + 1/(Blen(1)+Blen(2));
          end
@@ -228,7 +228,8 @@ end
 %%
 x = 1:winL;
 figure('Color','w')
-plot(x,mean(probi,1),'.-k'),grid,axis([1 winL .5 1])
+plot(probi','.-','LineWidth',1.5),hold on
+plot(x,mean(probi,1),'.-k'),grid,axis([1 winL .8 1])
 xlabel('Количество исключённых отсчётов','FontName','Times New Roman','FontSize',12)
 ylabel('Качество распознавания','FontName','Times New Roman','FontSize',12)
 % xlabel('Кількість виключених відліків','FontName','Times New Roman','FontSize',12)

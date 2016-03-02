@@ -1,6 +1,6 @@
-function out = transform(in, to_what)
+function [out] = transform(in, to_what)
 %TRANSFORM   Transforms or copies vectors or matrices between
-%   [ out( 1|N , N ) ] = imp_OSR( in( 1|N , N ) , 'to_what' )
+%   [ out( 1|N , N ) ] = transform( in( 1|N , N ) , 'to_what' )
 %   'to_what' can be:
 %   'vector' (by default)
 %   'matrix'

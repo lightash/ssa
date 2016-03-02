@@ -38,26 +38,74 @@ end
 
 %% pic 2 Orthogonal components
 dec = MOD(port{1},port{2});
-
+close all
 x1 = 1:winL;
 x2 = winL+1:2*winL;
 x3 = 2*winL+1:3*winL;
-figure('color','white')
-plot(x1,port{1},'k','LineWidth',1.5),hold on
-plot(x1,dec.s21*1.5,'--k','LineWidth',1.5)
-plot(x2,port{2},'k','LineWidth',1.5)
-plot(x2,dec.s12*1.5,'--k','LineWidth',1.5)
-plot(x3,dec.s11*1.5,'k','LineWidth',1.5)
-plot(x3,dec.s22*1.5,'--k','LineWidth',1.5)
-plot([x1(end) x1(end)],[-.3 .7],'--k','LineWidth',3)
-plot([x2(end) x2(end)],[-.3 .7],'--k','LineWidth',3),grid,axis tight
-leg = legend('S_1','s_2_1','S_2','s_1_2','s_1_1','s_2_2');
-set(leg,'FontName','Times New Roman','FontSize',14)
-xlabel({'Сквозная нумерация отсчётов';'Коллинеарные составляющие 1     Коллинеарные составляющие 2     Эксклюзивные составляющие'},...
-   'FontName','Times New Roman','FontSize',14)
-ylabel('Ортогональные составляющие сигнала','FontName','Times New Roman','FontSize',14)
 
-%% pic 3 Histograms samples
+figure('color','white','OuterPosition',[200 100 1000 480])
+plot(x1,port{1},'k','LineWidth',1.5),hold on
+annotation('textarrow',[.26 .27],[.46 .36],'String','S_1','FontName','Times New Roman','FontSize',14)
+plot(x1,dec.s21*1.5,'--k','LineWidth',1.5)
+annotation('textarrow',[.26 .27],[.26 .34],'String','s_2_1^*','FontName','Times New Roman','FontSize',14)
+plot(x2,port{2},'k','LineWidth',1.5)
+annotation('textarrow',[.52 .53],[.47 .37],'String','S_2','FontName','Times New Roman','FontSize',14)
+plot(x2,dec.s12*1.5,'--k','LineWidth',1.5)
+annotation('textarrow',[.52 .54],[.26 .35],'String','s_2_1^*','FontName','Times New Roman','FontSize',14)
+plot(x3,dec.s11*1.5,'k','LineWidth',1.5)
+annotation('textarrow',[.71 .7],[.47 .42],'String','s_1_1^*','FontName','Times New Roman','FontSize',14)
+plot(x3,dec.s22*1.5,'--k','LineWidth',1.5)
+annotation('textarrow',[.71 .7],[.26 .36],'String','s_2_2^*','FontName','Times New Roman','FontSize',14)
+plot([x1(end) x1(end)],[-.3 .7],'k','LineWidth',3)
+plot([x2(end) x2(end)],[-.3 .7],'k','LineWidth',3),grid,axis tight
+% leg = legend('S_1','s_2_1^*','S_2','s_1_2^*','s_1_1^*','s_2_2^*');
+% set(leg,'FontName','Times New Roman','FontSize',14)
+% xlabel({'Сквозная нумерация отсчётов';'Коллинеарные составляющие 1       Коллинеарные составляющие 2       Эксклюзивные составляющие'},...
+%    'FontName','Times New Roman','FontSize',14)
+% ylabel('Ортогональные составляющие сигнала','FontName','Times New Roman','FontSize',14)
+xlabel({'Continuous samples numbering';'Collinear components 1              Collinear components 2              Exclusive components'},...
+   'FontName','Times New Roman','FontSize',14)
+ylabel('Orthogonal components','FontName','Times New Roman','FontSize',14)
+
+%% pic 3.1 Histograms samples before decomposition
+btypeN = 2;
+Nbins = 16;
+for i = 1:winL
+   [hyp(i,:),scale(i,:)] = hist( [f(Bnum{1},i);f(Bnum{2},i)] ,Nbins);
+   
+   for btype = 1:btypeN
+      H{btype}(:,i) = hist( f(Bnum{btype},i) ,scale(i,:))/Blen(btype)';
+      % Распределить наименьший столбец по нулям
+      [minh,indh] = min(H{btype}( H{btype}(:,i)>0, i));
+      mzh = minh/( length( H{btype}( H{btype}(:,i)==0, i)) +1);
+      H{btype}( H{btype}(:,i)==0 | H{btype}(:,i)==minh, i) = mzh;
+   end
+end
+
+i = 20;
+Hb = zeros(4,size(H{1}(:,i),1)); % Nback Aback Nfore Afore
+for j = 1:size(H{1}(:,i),1)
+   if H{1}(j,i) > H{2}(j,i)
+      Hb(1,j) = H{1}(j,i);
+      Hb(4,j) = H{2}(j,i);
+   else
+      Hb(3,j) = H{1}(j,i);
+      Hb(2,j) = H{2}(j,i);
+   end
+end
+figure('Color','w')
+o = bar(scale(i,:),Hb(1,:));hold on
+set(o,'FaceColor',[.5 .5 .5]);
+bar(scale(i,:),Hb(2,:),'w'),hold on
+o = bar(scale(i,:),Hb(3,:));hold on
+set(o,'FaceColor',[.5 .5 .5]);
+bar(scale(i,:),Hb(4,:),'w'),grid
+legend('N','A')
+xlabel('Значения отсчёта','FontName','Times New Roman','FontSize',12)
+ylabel('Доля попаданий','FontName','Times New Roman','FontSize',12)
+
+
+%% pic 3 Histograms samples after decomposition
 for per = 1:perN
    dec = MOD(port{1},port{2},f(per,:));
    OrthDec{1}(per,:) = dec.x1;
@@ -97,9 +145,7 @@ for j = 3
    end
 end
 
-%% pic 3 graph
 figure('Color','w')
-
 i = 20;  % Hist to display
 for k = 1:3
    subplot(1,3,k)
@@ -211,6 +257,48 @@ xlabel({'Сквозная нумерация отсчётов';'Коллинеарные составляющие 1     Коллинеар
    'FontName','Times New Roman','FontSize',14)
 ylabel('Orth first iter probs','FontName','Times New Roman','FontSize',14)
 
+%% pic 6.1 Exclusion informativity, first iteration, excluding before orthogonal decomposition
+NAbeats = [Bnum{1} Bnum{2}];
+NAbeatsN = Blen(1)+Blen(2);
+dec = cell(1,NAbeatsN);
+for per = 1:NAbeatsN
+   dec{per} = MOD(port{1},port{2},f(NAbeats(per),:));
+end
+
+clear prob_first
+% Full probability
+des = zeros(btypeN);
+for per = 1:NAbeatsN
+   ind = des_MOD(dec{per});
+   des(Bord(NAbeats(per)),ind) = des(Bord(NAbeats(per)),ind) + 1/Blen(Bord(NAbeats(per)));
+end
+prob_first(:,1) = [des(1);des(end)];
+
+% Excuding by one
+for exclude = 1:winL
+   disp(exclude)
+
+   win = [1:exclude-1 exclude+1:winL];
+
+   des = zeros(btypeN);
+   for per = 1:NAbeatsN
+      ind = des_MOD(MOD(nrm(port{1}(win)), nrm(port{2}(win)), f(NAbeats(per),win)));
+      des(Bord(NAbeats(per)),ind) = des(Bord(NAbeats(per)),ind) + 1/Blen(Bord(NAbeats(per)));
+   end
+   prob_first(:,exclude+1) = [des(1);des(end)];
+end
+save('orth_inf_pic6_before','prob_first')
+
+%% pic 6.1 graph
+figure('color','white')
+plot(prob_first(1,:),'k','LineWidth',1.5),hold on
+plot(prob_first(2,:),'--k','LineWidth',1.5)
+plot(mean(prob_first,1),':k','LineWidth',1.5),grid,axis tight,ylim([.7 1])
+leg = legend('$\hat{p}_N$','$\hat{p}_A$','$\hat{p}_{cp}$');
+set(leg,'Interpreter','latex','FontName','Times New Roman','FontSize',14)
+xlabel('Number of excluded sample','FontName','Times New Roman','FontSize',14)
+ylabel('Probability of correct decisions','FontName','Times New Roman','FontSize',14)
+
 %% pic 7 Delta of pic 6
 dprob_first(1,:) = prob_first(1,:) - prob_first(1);
 dprob_first(2,:) = prob_first(2,:) - prob_first(2);
@@ -227,6 +315,21 @@ xlabel({'Сквозная нумерация отсчётов';'Коллинеарные составляющие 1     Коллинеар
    'FontName','Times New Roman','FontSize',14)
 ylabel('Orth first iter delta probs','FontName','Times New Roman','FontSize',14)
 
+%% pic 7.1 Delta of pic 6.1
+dprob_first(1,:) = prob_first(1,:) - prob_first(1);
+dprob_first(2,:) = prob_first(2,:) - prob_first(2);
+
+figure('color','white')
+plot(dprob_first(1,:),'k','LineWidth',1.5),hold on
+plot(dprob_first(2,:),'-.k','LineWidth',1.5)
+plot(mean(dprob_first,1),':k','LineWidth',1.5),grid,axis tight
+leg = legend('$\Delta\hat{p}_N$','$\Delta\hat{p}_A$','$\Delta\hat{p}_{cp}$');
+set(leg,'Interpreter','latex','FontName','Times New Roman','FontSize',14)
+% xlabel('Сквозная нумерация отсчётов','FontName','Times New Roman','FontSize',14)
+% ylabel('Orth first iter delta probs','FontName','Times New Roman','FontSize',14)
+xlabel('Number of excluded sample','FontName','Times New Roman','FontSize',14)
+ylabel({'Impact on probability' 'of correct decisions'},'FontName','Times New Roman','FontSize',14)
+
 %% pic 8 sorted pic 7
 figure('color','white')
 plot(sort(dprob_first(1,:),'descend'),'k','LineWidth',1.5),hold on
@@ -234,10 +337,16 @@ plot(sort(dprob_first(2,:),'descend'),'-.k','LineWidth',1.5)
 plot(sort(mean(dprob_first,1),'descend'),':k','LineWidth',1.5)
 plot([x1(end) x1(end)],[-.5 .2],'--k','LineWidth',3)
 plot([x2(end) x2(end)],[-.5 .2],'--k','LineWidth',3),grid,axis tight
-leg = legend('N','A','mean');
-set(leg,'FontName','Times New Roman','FontSize',14)
+leg = legend('$\hat{p}_N$','$\hat{p}_A$','$\hat{p}_{cp}$');
+set(leg,'Interpreter','latex','FontName','Times New Roman','FontSize',14)
 xlabel('Сквозная нумерация отсчётов','FontName','Times New Roman','FontSize',14)
 ylabel('Orth first iter delta probs','FontName','Times New Roman','FontSize',14)
+
+%% pic 8.1 sorted pic 7.1
+figure('color','white')
+plot(sort(mean(dprob_first,1),'descend'),'k','LineWidth',1.5),grid,axis tight
+xlabel('Number of excluded sample','FontName','Times New Roman','FontSize',14)
+ylabel({'Ranked impact on probability' 'of correct decisions'},'FontName','Times New Roman','FontSize',14)
 
 %% pic 9 Recognition quality by synchronous portraits composition, all iterations of exclusion informativity, excluding after orthogonal decomposition
 % Full probability
@@ -277,9 +386,9 @@ save('orth_inf_pic9','prob_all','win_rem','order')
 
 %% pic 9 graph
 figure('color','white')
-plot(prob_all,'.-k','LineWidth',1.5),grid,axis tight,ylim([.5 1])
-xlabel('Сквозная нумерация отсчётов','FontName','Times New Roman','FontSize',14)
-ylabel('Orth all iter mean probs','FontName','Times New Roman','FontSize',14)
+plot(prob_all,'.-k','LineWidth',1.5),grid,axis tight,ylim([.8 1])
+xlabel('Quantity of excluded samples','FontName','Times New Roman','FontSize',14)
+ylabel('Mean probability of recognition','FontName','Times New Roman','FontSize',14)
 
 %% pic 10 Recognition quality by asynchronous portraits composition, all iterations by first exclusion informativity (pic 6), excluding before orthogonal decomposition
 load('orth_inf_pic6','prob_first')
