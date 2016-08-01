@@ -21,23 +21,20 @@ winL = Bwin(2)-Bwin(1)+1;
 
 % Generating portraits
 perN = all_beats(end);  % Number of periods to use
-
-f = zeros(perN, winL );
-in_stab = zeros(size(in));
+f = zeros(perN, winL);
 for per = 1:perN
 
    period = mark(per);
    window = period+Bwin(1): period+Bwin(2);
-   in_stab(window) = in(window) - mean(in(window));
-   
    f(per,:) = in(window);
-   f(per,:) = f(per,:) - mean(f(per,:));
-end
+   fm(per) = mean(f(per,:));
+   f(per,:) = f(per,:) - fm(per);
 
+   [f(per,:), fs(per)] = nrm(f(per,:));
+end
 port = cell(1,btypeN);
 for btype = 1:btypeN
-   port{btype} = mean(f(Bnum{btype},:));
-   port{btype} = nrm(port{btype},1);
+   port{btype} = nrm(mean(f(Bnum{btype},:),1));
 end
 
 %% pic 1
@@ -48,9 +45,11 @@ plot(x,port{1},'k','LineWidth',1.5),hold on
 plot(x,port{2},'--k','LineWidth',1.5),hold on
 plot(x,port{3},':k','LineWidth',1.5),axis tight
 leg = legend('Normal beats','Atrial premature beats','Premature ventricular contraction');
-%set(leg,'FontName','Times New Roman','FontSize',14)
-xlabel('Time from R-peak, ms','FontName','Times New Roman','FontSize',14)
-ylabel('Shape of QRS-complexes','FontName','Times New Roman','FontSize',14),grid
+set(leg,'FontName','Times New Roman','FontSize',14,'Location','NorthOutside')
+% xlabel('Time from R-peak, ms','FontName','Times New Roman','FontSize',14)
+% ylabel('Shape of QRS-complexes','FontName','Times New Roman','FontSize',14),grid
+xlabel('Время от R-зубца, мс','FontName','Times New Roman','FontSize',14)
+ylabel('Форма QRS-комплексов','FontName','Times New Roman','FontSize',14),grid
 
 %% pic 3
 btypeN = 2;
@@ -87,21 +86,27 @@ o = bar(scale(i,:),Hb(3,:));hold on
 set(o,'FaceColor',[.5 .5 .5]);
 bar(scale(i,:),Hb(4,:),'w'),grid
 legend('N','A')
-xlabel('Shape characteristic value','FontName','Times New Roman','FontSize',14)
-ylabel({'Relative frequency for' 'the intervals of values'},'FontName','Times New Roman','FontSize',14)
+% xlabel('Shape characteristic value','FontName','Times New Roman','FontSize',14)
+% ylabel({'Relative frequency for' 'the intervals of values'},'FontName','Times New Roman','FontSize',14)
+xlabel('Значение характеристики формы','FontName','Times New Roman','FontSize',14)
+ylabel({'Относительная частота' 'интервалов значений'},'FontName','Times New Roman','FontSize',14)
 
 %% pic 4 & 5
 I(1,:) = DK( H{1}, H{2}, Blen(1), Blen(2) );
 figure('Color','w')
 plot(I(1,:),'.-k'),grid,axis tight
-xlabel('Count number','FontName','Times New Roman','FontSize',14)
-ylabel('Informativity','FontName','Times New Roman','FontSize',14)
+% xlabel('Sample number','FontName','Times New Roman','FontSize',14)
+% ylabel('Informativity','FontName','Times New Roman','FontSize',14)
+xlabel('Номер отсчёта','FontName','Times New Roman','FontSize',14)
+ylabel('Информативность','FontName','Times New Roman','FontSize',14)
 
 I(2,:) = AlphaZ( H{1}, H{2} );
 figure('Color','w')
 plot(I(2,:),'.-k'),grid,axis tight
-xlabel('Count number','FontName','Times New Roman','FontSize',14)
-ylabel('Informativity','FontName','Times New Roman','FontSize',14)
+% xlabel('Sample number','FontName','Times New Roman','FontSize',14)
+% ylabel('Informativity','FontName','Times New Roman','FontSize',14)
+xlabel('Номер отсчёта','FontName','Times New Roman','FontSize',14)
+ylabel('Информативность','FontName','Times New Roman','FontSize',14)
 
 %% pic 5 & 7
 for form = 1:size(I,1)
@@ -133,17 +138,18 @@ for form = 1:size(I,1)
       des_m(form,winL - Ndots +1) = (des(1,1)+des(2,2))/2;
    end
 end
-%%
-
+%% Kullback
 figure('Color','w')
 plot(des_m(1,:),'.-k'),grid,axis tight,ylim([.5 1])
-xlabel('Number of excluded counts','FontName','Times New Roman','FontSize',14)
+xlabel('Quantity of excluded samples','FontName','Times New Roman','FontSize',14)
 ylabel('Recognition quality','FontName','Times New Roman','FontSize',14)
-%%
+%% Az
 figure('Color','w')
 plot(des_m(2,:),'.-k'),grid,axis tight,ylim([.5 1])
-xlabel('Number of excluded counts','FontName','Times New Roman','FontSize',14)
-ylabel('Recognition quality','FontName','Times New Roman','FontSize',14)
+% xlabel('Quantity of excluded samples','FontName','Times New Roman','FontSize',14)
+% ylabel('Recognition quality','FontName','Times New Roman','FontSize',14)
+xlabel('Количество исключённых отсчётов','FontName','Times New Roman','FontSize',14)
+ylabel('Качество распознавания','FontName','Times New Roman','FontSize',14)
 
 
 
